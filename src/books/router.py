@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Annotated
 
 from fastapi import APIRouter, Query, HTTPException
@@ -11,12 +12,12 @@ from src.books.constants import messages
 router = APIRouter()
 
 BOOKS = [
-    Book(1, 'Computer Science', "mahdi", "good book", 5),
-    Book(2, 'be fast with fast api', "mahdi", "great book", 4),
-    Book(3, 'master endpoint', "mahdi", "awesome book", 2),
-    Book(4, 'HP1', "ali", "nice and good book", 3),
-    Book(5, 'HP2', "javad", "good & useful book", 1),
-    Book(5, 'HP3', "javad", "good & useful book", 2),
+    Book(1, 'Computer Science', "mahdi", "good book", 5, datetime(2020, 10, 12)),
+    Book(2, 'be fast with fast api', "mahdi", "great book", 4, datetime(2021, 4, 24)),
+    Book(3, 'master endpoint', "mahdi", "awesome book", 2, datetime(2018, 8, 12)),
+    Book(4, 'HP1', "ali", "nice and good book", 3, datetime(2012, 4, 13)),
+    Book(5, 'HP2', "javad", "good & useful book", 1, datetime(2012, 4, 14)),
+    Book(5, 'HP3', "javad", "good & useful book", 2, datetime(2012, 4, 15)),
 ]
 
 
@@ -52,6 +53,7 @@ async def update_book(book_id: int, updated_book: BookRequest):
             book.author = updated_book.author
             book.description = updated_book.description
             book.rating = updated_book.rating
+            book.published_date = updated_book.published_date
 
             return book
     raise HTTPException(status_code=404, detail=messages.BOOK_NOT_FOUND)
