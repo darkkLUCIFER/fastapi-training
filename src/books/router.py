@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional, Annotated
+from starlette import status
 
 from fastapi import APIRouter, Query, HTTPException, Path
 
@@ -21,7 +22,7 @@ BOOKS = [
 ]
 
 
-@router.get("/books")
+@router.get("/books", status_code=status.HTTP_200_OK)
 async def read_all_books(
     rating: Annotated[Optional[int], Query(ge=0, le=5)] = None,
     published_date: Optional[datetime | None] = None,
@@ -41,7 +42,7 @@ async def read_all_books(
     return books
 
 
-@router.get("/books/{book_id}")
+@router.get("/books/{book_id}", status_code=status.HTTP_200_OK)
 async def read_book(book_id: Annotated[int, Path(ge=1)]):
     for book in BOOKS:
         if book.id == book_id:
@@ -49,7 +50,7 @@ async def read_book(book_id: Annotated[int, Path(ge=1)]):
     raise HTTPException(status_code=404, detail=messages.BOOK_NOT_FOUND)
 
 
-@router.delete("/books/{book_id}")
+@router.delete("/books/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(book_id: Annotated[int, Path(ge=1)]):
     for book in BOOKS:
         if book.id == book_id:
@@ -57,7 +58,7 @@ async def delete_book(book_id: Annotated[int, Path(ge=1)]):
     raise HTTPException(status_code=404, detail=messages.BOOK_NOT_FOUND)
 
 
-@router.put("/books/{book_id}/update_book/")
+@router.put("/books/{book_id}/update_book/", status_code=status.HTTP_200_OK)
 async def update_book(book_id: Annotated[int, Path(ge=1)], updated_book: BookRequest):
     for book in BOOKS:
         if book.id == book_id:
@@ -71,7 +72,7 @@ async def update_book(book_id: Annotated[int, Path(ge=1)], updated_book: BookReq
     raise HTTPException(status_code=404, detail=messages.BOOK_NOT_FOUND)
 
 
-@router.post("/create-book")
+@router.post("/create-book", status_code=status.HTTP_201_CREATED)
 async def create_book(book_request: BookRequest):
     new_book = Book(**book_request.model_dump())
     created_book = find_book_id(new_book)
