@@ -17,16 +17,28 @@ BOOKS = [
     Book(3, 'master endpoint', "mahdi", "awesome book", 2, datetime(2018, 8, 12)),
     Book(4, 'HP1', "ali", "nice and good book", 3, datetime(2012, 4, 13)),
     Book(5, 'HP2', "javad", "good & useful book", 1, datetime(2012, 4, 14)),
-    Book(5, 'HP3', "javad", "good & useful book", 2, datetime(2012, 4, 15)),
+    Book(5, 'HP3', "javad", "good & useful book", 2, datetime(2012, 4, 14)),
 ]
 
 
 @router.get("/books")
-async def read_all_books(rating: Annotated[Optional[int], Query(ge=0, le=5)] = None):
-    if rating is not None:
-        return [book for book in BOOKS if book.rating == rating]
+async def read_all_books(
+    rating: Annotated[Optional[int], Query(ge=0, le=5)] = None,
+    published_date: Optional[datetime | None] = None,
+):
+    books = BOOKS
 
-    return BOOKS
+    if rating is not None:
+        books = [book for book in books if book.rating == rating]
+
+    if published_date is not None:
+        books = [
+            book
+            for book in books
+            if book.published_date == published_date
+        ]
+
+    return books
 
 
 @router.get("/books/{book_id}")
