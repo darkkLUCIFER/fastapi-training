@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from typing import Optional, Annotated
+
+from fastapi import APIRouter, Query
 
 from src.books.models import Book
 from src.books.schema import BookRequest
@@ -13,11 +15,15 @@ BOOKS = [
     Book(3, 'master endpoint', "mahdi", "awesome book", 2),
     Book(4, 'HP1', "ali", "nice and good book", 3),
     Book(5, 'HP2', "javad", "good & useful book", 1),
+    Book(5, 'HP3', "javad", "good & useful book", 2),
 ]
 
 
 @router.get("/books")
-async def read_all_books():
+async def read_all_books(rating: Annotated[Optional[int], Query(ge=0, le=5)] = None):
+    if rating is not None:
+        return [book for book in BOOKS if book.rating == rating]
+
     return BOOKS
 
 
