@@ -7,6 +7,7 @@ from src.books.schema import BookRequest
 from src.books.utils import find_book_id
 from src.books.constants import messages
 
+
 router = APIRouter()
 
 BOOKS = [
@@ -32,6 +33,15 @@ async def read_book(book_id: int):
     for book in BOOKS:
         if book.id == book_id:
             return book
+    raise HTTPException(status_code=404, detail=messages.BOOK_NOT_FOUND)
+
+
+@router.delete("/books/{book_id}")
+async def delete_book(book_id: int):
+    for book in BOOKS:
+        if book.id == book_id:
+            BOOKS.remove(book)
+    raise HTTPException(status_code=404, detail=messages.BOOK_NOT_FOUND)
 
 
 @router.put("/books/{book_id}/update_book/")
