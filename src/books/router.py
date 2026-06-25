@@ -1,11 +1,11 @@
 from typing import Optional, Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, HTTPException
 
 from src.books.models import Book
 from src.books.schema import BookRequest
 from src.books.utils import find_book_id
-
+from src.books.constants import messages
 
 router = APIRouter()
 
@@ -32,6 +32,19 @@ async def read_book(book_id: int):
     for book in BOOKS:
         if book.id == book_id:
             return book
+
+
+@router.put("/books/{book_id}/update_book/")
+async def update_book(book_id: int, updated_book: BookRequest):
+    for book in BOOKS:
+        if book.id == book_id:
+            book.title = updated_book.title
+            book.author = updated_book.author
+            book.description = updated_book.description
+            book.rating = updated_book.rating
+
+            return book
+    raise HTTPException(status_code=404, detail=messages.BOOK_NOT_FOUND)
 
 
 @router.post("/create-book")
