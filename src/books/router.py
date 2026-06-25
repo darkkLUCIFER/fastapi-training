@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Annotated
 
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Path
 
 from src.books.models import Book
 from src.books.schema import BookRequest
@@ -42,7 +42,7 @@ async def read_all_books(
 
 
 @router.get("/books/{book_id}")
-async def read_book(book_id: int):
+async def read_book(book_id: Annotated[int, Path(ge=1)]):
     for book in BOOKS:
         if book.id == book_id:
             return book
@@ -50,7 +50,7 @@ async def read_book(book_id: int):
 
 
 @router.delete("/books/{book_id}")
-async def delete_book(book_id: int):
+async def delete_book(book_id: Annotated[int, Path(ge=1)]):
     for book in BOOKS:
         if book.id == book_id:
             BOOKS.remove(book)
@@ -58,7 +58,7 @@ async def delete_book(book_id: int):
 
 
 @router.put("/books/{book_id}/update_book/")
-async def update_book(book_id: int, updated_book: BookRequest):
+async def update_book(book_id: Annotated[int, Path(ge=1)], updated_book: BookRequest):
     for book in BOOKS:
         if book.id == book_id:
             book.title = updated_book.title
