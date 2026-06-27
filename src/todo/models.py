@@ -1,4 +1,4 @@
-from sqlalchemy import String, SmallInteger, func, CheckConstraint, false
+from sqlalchemy import String, SmallInteger, CheckConstraint, false
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core import Base
