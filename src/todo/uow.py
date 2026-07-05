@@ -4,16 +4,16 @@ from src.core import SessionLocal
 from src.todo.repository import TodoRepository
 
 
-__all__ = ('TodoUnitOfWork',)
+__all__ = ('TodoUow',)
 
 
-class TodoUnitOfWork:
+class TodoUow:
     def __init__(self, session_factory=SessionLocal):
         self._session_factory = session_factory
 
-    def __enter__(self) -> "TodoUnitOfWork":
+    def __enter__(self) -> "TodoUow":
         self.session: Session = self._session_factory()
-        self.repository = TodoRepository(self.session)
+        self.repository = TodoRepository(db=self.session)
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:

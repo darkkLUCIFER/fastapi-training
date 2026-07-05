@@ -3,14 +3,14 @@ from fastapi import BackgroundTasks
 from src.todo.email import EmailService
 from src.todo.models import Todo
 from src.todo.schema import CreateTodoSchema
-from src.todo.unit_of_work import TodoUnitOfWork
+from src.todo.uow import TodoUow
 
 
 __all__ = ('TodoService',)
 
 
 class TodoService:
-    def __init__(self, uow: TodoUnitOfWork, email: EmailService):
+    def __init__(self, uow: TodoUow, email: EmailService):
         self.uow = uow
         self.email = email
 
