@@ -16,6 +16,6 @@ class Todo(TimestampMixin, Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(length=100))
-    description: Mapped[str | None] = mapped_column()
+    description: Mapped[str | None] = mapped_column(String(length=500))
     priority: Mapped[int | None] = mapped_column(SmallInteger)
     completed: Mapped[bool] = mapped_column(default=False, server_default=false())
