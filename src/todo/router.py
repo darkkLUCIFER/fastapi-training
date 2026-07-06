@@ -21,7 +21,15 @@ def create_todo(
 
 
 @router.get('/', response_model=list[TodoResponseSchema], status_code=status.HTTP_200_OK)
-def todo_list(
+def list_todos(
     service: Annotated[TodoService, Depends(get_todo_service)],
 ):
     return service.get_all()
+
+
+@router.get('/{todo_id}', response_model=TodoResponseSchema, status_code=status.HTTP_200_OK)
+def get_todo(
+    todo_id: Annotated[int, Path(ge=1)],
+    service: Annotated[TodoService, Depends(get_todo_service)],
+):
+    return service.get_one(todo_id=todo_id)

@@ -1,5 +1,6 @@
 from fastapi import BackgroundTasks
 
+from src.core.exceptions import NotFoundError
 from src.todo.email import EmailService
 from src.todo.models import Todo
 from src.todo.schema import CreateTodoSchema
@@ -26,3 +27,10 @@ class TodoService:
     def get_all(self) -> list[Todo]:
         with self.uow:
             return self.uow.repository.get_all()
+
+    def get_one(self, todo_id: int) -> Todo:
+        with self.uow:
+            todo = self.uow.repository.get_one(todo_id=todo_id)
+            if not todo:
+                raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
+            return todo

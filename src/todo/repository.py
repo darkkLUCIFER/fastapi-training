@@ -15,3 +15,6 @@ class TodoRepository:
 
     def get_all(self) -> list[Todo]:
         return self.db.query(Todo).all()  # noqa
+
+    def get_one(self, todo_id: int) -> Todo | None:
+        return self.db.query(Todo).filter(Todo.id == todo_id).first()
