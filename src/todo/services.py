@@ -3,7 +3,7 @@ from fastapi import BackgroundTasks
 from src.core.exceptions import NotFoundError
 from src.todo.email import EmailService
 from src.todo.models import Todo
-from src.todo.schema import CreateTodoSchema
+from src.todo.schema import CreateTodoSchema, UpdateTodoSchema
 from src.todo.uow import TodoUow
 
 
@@ -33,4 +33,16 @@ class TodoService:
             todo = self.uow.repository.get_one(todo_id=todo_id)
             if not todo:
                 raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
+            return todo
+
+    def update_one(self, todo_id: int, data: UpdateTodoSchema) -> Todo:
+        with self.uow:
+            todo = self.uow.repository.get_one(todo_id=todo_id)
+            if not todo:
+                raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
+            for field, value in data.model_dump(exclude_unset=True).items():
+                setattr(todo, field, value)
+            self.uow.repository.update(todo)
+            self.uow.commit()
+            self.uow.refresh(todo)
             return todo

@@ -39,7 +39,7 @@ class UpdateTodoSchema(BaseModel):
                 "title": "shop mall",
                 "description": "with ali",
                 "priority": 2,
-                completed: True
+                "completed": True
             }
         }
     )

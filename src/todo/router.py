@@ -33,3 +33,12 @@ def get_todo(
     service: Annotated[TodoService, Depends(get_todo_service)],
 ):
     return service.get_one(todo_id=todo_id)
+
+
+@router.patch('/{todo_id}', response_model=TodoResponseSchema, status_code=status.HTTP_200_OK)
+def update_todo(
+    todo_id: Annotated[int, Path(ge=1)],
+    service: Annotated[TodoService, Depends(get_todo_service)],
+    data: UpdateTodoSchema,
+):
+    return service.update_one(todo_id=todo_id, data=data)
