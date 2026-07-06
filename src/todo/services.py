@@ -15,6 +15,12 @@ class TodoService:
         self.uow = uow
         self.email = email
 
+    def _get_todo_or_raise(self, todo_id: int) -> Todo:
+        todo = self.uow.repository.get_one(todo_id=todo_id)
+        if not todo:
+            raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
+        return todo
+
     def create(self, data: CreateTodoSchema, background_tasks: BackgroundTasks) -> Todo:
         todo = Todo(**data.model_dump())
         with self.uow:
@@ -30,16 +36,11 @@ class TodoService:
 
     def get_one(self, todo_id: int) -> Todo:
         with self.uow:
-            todo = self.uow.repository.get_one(todo_id=todo_id)
-            if not todo:
-                raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
-            return todo
+            return self._get_todo_or_raise(todo_id)
 
     def update_one(self, todo_id: int, data: UpdateTodoSchema) -> Todo:
         with self.uow:
-            todo = self.uow.repository.get_one(todo_id=todo_id)
-            if not todo:
-                raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
+            todo = self._get_todo_or_raise(todo_id)
             for field, value in data.model_dump(exclude_unset=True).items():
                 setattr(todo, field, value)
             self.uow.repository.update(todo)
@@ -49,8 +50,6 @@ class TodoService:
 
     def delete_one(self, todo_id: int) -> None:
         with self.uow:
-            todo = self.uow.repository.get_one(todo_id=todo_id)
-            if not todo:
-                raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
+            todo = self._get_todo_or_raise(todo_id)
             self.uow.repository.delete(todo)
             self.uow.commit()
