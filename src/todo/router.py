@@ -12,7 +12,11 @@ router = APIRouter()
 
 
 @router.post(
-    "/", response_model=TodoResponseSchema, status_code=status.HTTP_201_CREATED
+    "/",
+    response_model=TodoResponseSchema,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new todo",
+    description="Create a new todo item with title, description, and priority.",
 )
 def create_todo(
     data: CreateTodoSchema,
@@ -23,7 +27,11 @@ def create_todo(
 
 
 @router.get(
-    "/", response_model=list[TodoResponseSchema], status_code=status.HTTP_200_OK
+    "/",
+    response_model=list[TodoResponseSchema],
+    status_code=status.HTTP_200_OK,
+    summary="List all todos",
+    description="Retrieve a list of all todo items.",
 )
 def list_todos(
     service: Annotated[TodoService, Depends(get_todo_service)],
@@ -32,7 +40,11 @@ def list_todos(
 
 
 @router.get(
-    "/{todo_id}", response_model=TodoResponseSchema, status_code=status.HTTP_200_OK
+    "/{todo_id}",
+    response_model=TodoResponseSchema,
+    status_code=status.HTTP_200_OK,
+    summary="Get a todo by ID",
+    description="Retrieve a single todo item by its ID.",
 )
 def get_todo(
     todo_id: Annotated[int, Path(ge=1)],
@@ -42,7 +54,11 @@ def get_todo(
 
 
 @router.patch(
-    "/{todo_id}", response_model=TodoResponseSchema, status_code=status.HTTP_200_OK
+    "/{todo_id}",
+    response_model=TodoResponseSchema,
+    status_code=status.HTTP_200_OK,
+    summary="Update a todo",
+    description="Update a todo item. Only provided fields will be updated.",
 )
 def update_todo(
     todo_id: Annotated[int, Path(ge=1)],
@@ -52,7 +68,12 @@ def update_todo(
     return service.update_one(todo_id=todo_id, data=data)
 
 
-@router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{todo_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a todo",
+    description="Delete a todo item by its ID.",
+)
 def delete_todo(
     todo_id: Annotated[int, Path(ge=1)],
     service: Annotated[TodoService, Depends(get_todo_service)],
