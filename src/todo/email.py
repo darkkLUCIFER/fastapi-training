@@ -10,5 +10,5 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     @staticmethod
-    def send_created(todo: Todo) -> None:
+    async def send_created(todo: Todo) -> None:
         logger.info("Email -> todo %s created: %s", todo.id, todo.title)
