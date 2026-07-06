@@ -1,3 +1,5 @@
+from types import TracebackType
+
 from sqlalchemy.orm import Session
 
 from src.core import SessionLocal
@@ -16,7 +18,12 @@ class TodoUow:
         self.repository = TodoRepository(db=self.session)
         return self
 
-    def __exit__(self, exc_type, exc, tb) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
         if exc_type is not None:
             self.rollback()
         self.session.close()
