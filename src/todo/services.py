@@ -22,3 +22,7 @@ class TodoService:
             self.uow.refresh(todo)
         background_tasks.add_task(self.email.send_created, todo)
         return todo
+
+    def get_all(self) -> list[Todo]:
+        with self.uow:
+            return self.uow.repository.get_all()

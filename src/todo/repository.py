@@ -12,3 +12,6 @@ class TodoRepository:
     def create(self, todo: Todo) -> Todo:
         self.db.add(todo)
         return todo
+
+    def get_all(self) -> list[Todo]:
+        return self.db.query(Todo).all()  # noqa

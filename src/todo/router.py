@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, Path
 from starlette import status
 
 from src.todo.dependencies import get_todo_service
-from src.todo.schema import CreateTodoSchema, TodoResponseSchema
+from src.todo.schema import CreateTodoSchema, TodoResponseSchema, UpdateTodoSchema
 from src.todo.services import TodoService
 
 
@@ -18,3 +18,10 @@ def create_todo(
     service: Annotated[TodoService, Depends(get_todo_service)],
 ):
     return service.create(data, background_tasks)
+
+
+@router.get('/', response_model=list[TodoResponseSchema], status_code=status.HTTP_200_OK)
+def todo_list(
+    service: Annotated[TodoService, Depends(get_todo_service)],
+):
+    return service.get_all()
