@@ -6,6 +6,8 @@ from sqlalchemy import pool
 from alembic import context
 from src.core.database import Base
 from src.core import settings
+from src.core.database import models  # noqa: F401  — registers all models on Base.metadata
+
 
 # Import all models so they are registered with Base.metadata
 
