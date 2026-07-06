@@ -5,8 +5,11 @@ from src.core import Base
 from src.core.database.mixins import TimestampMixin
 
 
+__all__ = ("Todo",)
+
+
 class Todo(TimestampMixin, Base):
-    __tablename__ = 'todos'
+    __tablename__ = "todos"
     __table_args__ = (
         CheckConstraint(
             "priority BETWEEN 1 AND 5",

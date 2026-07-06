@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from src.core.exceptions import NotFoundError
 
 
-__all__ = ('not_found_error_handler',)
+__all__ = ("not_found_error_handler",)
 
 
 async def not_found_error_handler(request: Request, exc: NotFoundError):

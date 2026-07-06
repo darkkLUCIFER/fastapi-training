@@ -1,4 +1,4 @@
-__all__ = ('NotFoundError',)
+__all__ = ("NotFoundError",)
 
 
 class NotFoundError(Exception):

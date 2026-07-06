@@ -4,7 +4,7 @@ from sqlalchemy import DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-__all__ = ('TimestampMixin',)
+__all__ = ("TimestampMixin",)
 
 
 class TimestampMixin:

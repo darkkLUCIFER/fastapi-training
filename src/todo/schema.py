@@ -4,11 +4,7 @@ from typing import Annotated
 from pydantic import BaseModel, Field, ConfigDict
 
 
-__all__ = (
-    'CreateTodoSchema',
-    'UpdateTodoSchema',
-    'TodoResponseSchema'
-)
+__all__ = ("CreateTodoSchema", "UpdateTodoSchema", "TodoResponseSchema")
 
 
 class CreateTodoSchema(BaseModel):
@@ -39,7 +35,7 @@ class UpdateTodoSchema(BaseModel):
                 "title": "shop mall",
                 "description": "with ali",
                 "priority": 2,
-                "completed": True
+                "completed": True,
             }
         }
     )

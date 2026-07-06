@@ -6,10 +6,8 @@ from sqlalchemy.orm import sessionmaker, Session
 from src.core.config import settings
 
 
-__all__ = ('SessionLocal', 'get_db')
-
+__all__ = ("get_db", "SessionLocal")
 engine = create_engine(settings.database_url, echo=settings.debug)
-
 SessionLocal = sessionmaker[Session](
     bind=engine,
     autoflush=False,

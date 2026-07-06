@@ -4,7 +4,7 @@ from src.core import SessionLocal
 from src.todo.repository import TodoRepository
 
 
-__all__ = ('TodoUow',)
+__all__ = ("TodoUow",)
 
 
 class TodoUow:

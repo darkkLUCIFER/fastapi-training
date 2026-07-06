@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from src.todo.models import Todo
 
 
-__all__ = ('TodoRepository',)
+__all__ = ("TodoRepository",)
 
 
 class TodoRepository:
@@ -17,7 +17,7 @@ class TodoRepository:
         return self.db.query(Todo).all()  # noqa
 
     def get_one(self, todo_id: int) -> Todo | None:
-        return self.db.query(Todo).filter(Todo.id == todo_id).first() # noqa
+        return self.db.query(Todo).filter(Todo.id == todo_id).first()  # noqa
 
     def update(self, todo: Todo) -> Todo:
         return self.db.merge(todo)

@@ -7,7 +7,7 @@ from src.todo.schema import CreateTodoSchema, UpdateTodoSchema
 from src.todo.uow import TodoUow
 
 
-__all__ = ('TodoService',)
+__all__ = ("TodoService",)
 
 
 class TodoService:

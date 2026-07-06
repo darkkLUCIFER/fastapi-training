@@ -11,7 +11,9 @@ from src.todo.services import TodoService
 router = APIRouter()
 
 
-@router.post("/", response_model=TodoResponseSchema, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", response_model=TodoResponseSchema, status_code=status.HTTP_201_CREATED
+)
 def create_todo(
     data: CreateTodoSchema,
     background_tasks: BackgroundTasks,
@@ -20,14 +22,18 @@ def create_todo(
     return service.create(data, background_tasks)
 
 
-@router.get('/', response_model=list[TodoResponseSchema], status_code=status.HTTP_200_OK)
+@router.get(
+    "/", response_model=list[TodoResponseSchema], status_code=status.HTTP_200_OK
+)
 def list_todos(
     service: Annotated[TodoService, Depends(get_todo_service)],
 ):
     return service.get_all()
 
 
-@router.get('/{todo_id}', response_model=TodoResponseSchema, status_code=status.HTTP_200_OK)
+@router.get(
+    "/{todo_id}", response_model=TodoResponseSchema, status_code=status.HTTP_200_OK
+)
 def get_todo(
     todo_id: Annotated[int, Path(ge=1)],
     service: Annotated[TodoService, Depends(get_todo_service)],
@@ -35,7 +41,9 @@ def get_todo(
     return service.get_one(todo_id=todo_id)
 
 
-@router.patch('/{todo_id}', response_model=TodoResponseSchema, status_code=status.HTTP_200_OK)
+@router.patch(
+    "/{todo_id}", response_model=TodoResponseSchema, status_code=status.HTTP_200_OK
+)
 def update_todo(
     todo_id: Annotated[int, Path(ge=1)],
     service: Annotated[TodoService, Depends(get_todo_service)],
@@ -44,7 +52,7 @@ def update_todo(
     return service.update_one(todo_id=todo_id, data=data)
 
 
-@router.delete('/{todo_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_todo(
     todo_id: Annotated[int, Path(ge=1)],
     service: Annotated[TodoService, Depends(get_todo_service)],

@@ -3,7 +3,7 @@ import logging
 from src.todo.models import Todo
 
 
-__all__ = ('EmailService',)
+__all__ = ("EmailService",)
 
 logger = logging.getLogger(__name__)
 
