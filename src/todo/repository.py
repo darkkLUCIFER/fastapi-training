@@ -17,8 +17,10 @@ class TodoRepository:
         return self.db.query(Todo).all()  # noqa
 
     def get_one(self, todo_id: int) -> Todo | None:
-        return self.db.query(Todo).filter(Todo.id == todo_id).first()
+        return self.db.query(Todo).filter(Todo.id == todo_id).first() # noqa
 
     def update(self, todo: Todo) -> Todo:
-        self.db.merge(todo)
-        return todo
+        return self.db.merge(todo)
+
+    def delete(self, todo: Todo) -> None:
+        self.db.delete(todo)

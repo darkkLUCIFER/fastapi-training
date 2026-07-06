@@ -46,3 +46,11 @@ class TodoService:
             self.uow.commit()
             self.uow.refresh(todo)
             return todo
+
+    def delete_one(self, todo_id: int) -> None:
+        with self.uow:
+            todo = self.uow.repository.get_one(todo_id=todo_id)
+            if not todo:
+                raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
+            self.uow.repository.delete(todo)
+            self.uow.commit()

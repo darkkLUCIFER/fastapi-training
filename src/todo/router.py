@@ -42,3 +42,11 @@ def update_todo(
     data: UpdateTodoSchema,
 ):
     return service.update_one(todo_id=todo_id, data=data)
+
+
+@router.delete('/{todo_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_todo(
+    todo_id: Annotated[int, Path(ge=1)],
+    service: Annotated[TodoService, Depends(get_todo_service)],
+):
+    return service.delete_one(todo_id=todo_id)
