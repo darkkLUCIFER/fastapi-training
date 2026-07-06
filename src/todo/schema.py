@@ -27,7 +27,7 @@ class UpdateTodoSchema(BaseModel):
     title: Annotated[str | None, Field(min_length=1)] = None
     description: Annotated[str | None, Field(min_length=1)] = None
     priority: Annotated[int | None, Field(ge=1, le=5)] = None
-    completed: Annotated[bool | None, Field(default=False)] = None
+    completed: bool | None = None
 
     model_config = ConfigDict(
         json_schema_extra={

@@ -19,8 +19,5 @@ class TodoRepository:
     def get_one(self, todo_id: int) -> Todo | None:
         return self.db.query(Todo).filter(Todo.id == todo_id).first()  # noqa
 
-    def update(self, todo: Todo) -> Todo:
-        return self.db.merge(todo)
-
     def delete(self, todo: Todo) -> None:
         self.db.delete(todo)
