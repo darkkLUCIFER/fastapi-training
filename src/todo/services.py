@@ -23,33 +23,28 @@ class TodoService:
 
     def create(self, data: CreateTodoSchema, background_tasks: BackgroundTasks) -> Todo:
         todo = Todo(**data.model_dump())
-        with self.uow:
-            self.uow.repository.create(todo)
-            self.uow.commit()
-            self.uow.refresh(todo)
+        self.uow.repository.create(todo)
+        self.uow.commit()
+        self.uow.refresh(todo)
         background_tasks.add_task(self.email.send_created, todo)
         return todo
 
     def get_all(self) -> list[Todo]:
-        with self.uow:
-            return self.uow.repository.get_all()
+        return self.uow.repository.get_all()
 
     def get_one(self, todo_id: int) -> Todo:
-        with self.uow:
-            return self._get_todo_or_raise(todo_id)
+        return self._get_todo_or_raise(todo_id)
 
     def update_one(self, todo_id: int, data: UpdateTodoSchema) -> Todo:
-        with self.uow:
-            todo = self._get_todo_or_raise(todo_id)
-            for field, value in data.model_dump(exclude_unset=True).items():
-                setattr(todo, field, value)
-            self.uow.repository.update(todo)
-            self.uow.commit()
-            self.uow.refresh(todo)
-            return todo
+        todo = self._get_todo_or_raise(todo_id)
+        for field, value in data.model_dump(exclude_unset=True).items():
+            setattr(todo, field, value)
+        self.uow.repository.update(todo)
+        self.uow.commit()
+        self.uow.refresh(todo)
+        return todo
 
     def delete_one(self, todo_id: int) -> None:
-        with self.uow:
-            todo = self._get_todo_or_raise(todo_id)
-            self.uow.repository.delete(todo)
-            self.uow.commit()
+        todo = self._get_todo_or_raise(todo_id)
+        self.uow.repository.delete(todo)
+        self.uow.commit()
