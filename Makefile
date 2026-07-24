@@ -26,3 +26,9 @@ current:
 
 history:
 	@alembic history --verbose
+
+run_local_server:
+	@fastapi dev src/main.py
+
+run_production_server:
+	@fastapi run src/main.py
