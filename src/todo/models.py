@@ -1,4 +1,4 @@
-from sqlalchemy import String, SmallInteger, CheckConstraint, false
+from sqlalchemy import String, SmallInteger, CheckConstraint, false, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core import Base
@@ -18,6 +18,7 @@ class Todo(TimestampMixin, Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     title: Mapped[str] = mapped_column(String(length=100))
     description: Mapped[str | None] = mapped_column(String(length=500))
     priority: Mapped[int | None] = mapped_column(SmallInteger)
