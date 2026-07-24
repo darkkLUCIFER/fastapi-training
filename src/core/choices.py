@@ -9,6 +9,6 @@ class ChoiceEnum(Enum):
 
     def __new__(cls, value, label):
         obj = object.__new__(cls)
-        obj.__value__ = value
+        obj._value_ = value
         obj.label = label
         return obj
