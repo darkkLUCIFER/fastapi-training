@@ -1,0 +1,115 @@
+[project]
+name = 'books-fastapi'
+version = '0.1.0'
+description = 'FastAPI todo/books service'
+readme = 'README.md'
+requires-python = '>=3.12'
+dependencies = [
+    'fastapi[standard]',
+    'pydantic-settings==2.14.2',
+    'sqlalchemy==2.0.51',
+    'alembic==1.18.5',
+    'psycopg2-binary==2.9.*',
+]
+
+[project.optional-dependencies]
+dev = [
+    'ruff>=0.14',
+    'pre-commit>=4.6',
+]
+
+[dependency-groups]
+dev = [
+    'ruff>=0.14',
+    'pre-commit>=4.6',
+]
+
+[build-system]
+requires = ['hatchling']
+build-backend = 'hatchling.build'
+
+[tool.hatch.build.targets.wheel]
+packages = ['src']
+
+[tool.ruff]
+target-version = 'py312'
+fix = true
+indent-width = 4
+line-length = 120
+show-fixes = true
+cache-dir = '.cache/ruff'
+output-format = 'concise'
+exclude = [
+    '*/migrations/*.py',
+    '__pycache__',
+    '.vscode',
+    'scripts',
+    '.idea',
+    'venv',
+    '.venv',
+    'alembic/versions/*.py',
+]
+extend-include = ['sandbox.py']
+
+[tool.ruff.format]
+line-ending = 'auto'
+quote-style = 'single'
+indent-style = 'space'
+docstring-code-format = true
+docstring-code-line-length = 79
+skip-magic-trailing-comma = false
+
+# https://docs.astral.sh/ruff/rules/
+[tool.ruff.lint]
+select = [
+    'S', # security
+    'F', # flake8
+    'PIE', # improving code quality and readability
+    'A', # builtin names used
+    'E', # errors
+    'W', # warnings
+    'I', # isort
+    'TID', # tidier imports
+    'TCH', # imports for type checking
+    'N', # naming
+    'C4', # list/set/dict comprehensions
+    'D419', # doc style
+    'ICN', # import conventions
+    'UP', # syntax newer
+    'ASYNC', # async
+    'T20', # found print
+    'RSE', # Unnecessary parentheses on raised exception
+    'RET', # checks returns
+    'SIM', # simplify
+    'TD', # todos comments
+    'FIX', # fix me comments
+]
+extend-ignore = [
+    'UP031', # Use format specifiers instead of percent format
+    'S101', # Use of `assert` detected
+    'RET503', # Missing explicit `return` at the end of function able to return non-`None` value
+    'S501', # requests with verify=False
+    'FIX002', # Line contains TO-DO, consider resolving the issue
+    'TD003', # Missing issue link on the line following this TO-DO
+    'UP007', # non-pep604-annotation
+    'S105', # Possible hardcoded password assigned
+    'S106', # Possible hardcoded password assigned to argument
+    'S107', # Possible hardcoded password assigned to function default
+    'N818', # Exception name `MyException` should be named with an Error suffix
+]
+
+[tool.ruff.lint.isort]
+from-first = true
+length-sort = true
+order-by-type = true
+case-sensitive = true
+force-wrap-aliases = true
+combine-as-imports = true
+detect-same-package = true
+length-sort-straight = true
+split-on-trailing-comma = true
+force-sort-within-sections = true
+lines-after-imports = 2
+known-first-party = ['src']
+section-order = ['future', 'standard-library', 'third-party', 'first-party']
+no-lines-before = ['future']
