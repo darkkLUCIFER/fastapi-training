@@ -1,7 +1,7 @@
-from src.core.exceptions import NotFoundError, NotMatchError
-
 from fastapi import Request
 from fastapi.responses import JSONResponse
+
+from src.core.exceptions import NotFoundError, NotMatchError
 
 
 __all__ = ('not_found_error_handler', 'not_match_error_handler')

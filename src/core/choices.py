@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-__all__ = ("ChoiceEnum",)
+__all__ = ('ChoiceEnum',)
 
 
 class ChoiceEnum(Enum):
