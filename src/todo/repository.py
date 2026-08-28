@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
+
 from src.todo.models import Todo
 
 
-__all__ = ("TodoRepository",)
+__all__ = ('TodoRepository',)
 
 
 class TodoRepository:

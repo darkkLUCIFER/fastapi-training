@@ -1,13 +1,13 @@
 from fastapi import BackgroundTasks
 
-from src.core.exceptions import NotFoundError
+from src.todo.uow import TodoUow
 from src.todo.email import EmailService
 from src.todo.models import Todo
 from src.todo.schema import CreateTodoSchema, UpdateTodoSchema
-from src.todo.uow import TodoUow
+from src.core.exceptions import NotFoundError
 
 
-__all__ = ("TodoService",)
+__all__ = ('TodoService',)
 
 
 class TodoService:

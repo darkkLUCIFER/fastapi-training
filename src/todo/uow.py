@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from src.todo.repository import TodoRepository
 
 
-__all__ = ("TodoUow",)
+__all__ = ('TodoUow',)
 
 
 class TodoUow:
@@ -13,7 +13,7 @@ class TodoUow:
         self.session = session
         self.repository = TodoRepository(db=session)
 
-    def __enter__(self) -> "TodoUow":
+    def __enter__(self) -> 'TodoUow':
         return self
 
     def __exit__(

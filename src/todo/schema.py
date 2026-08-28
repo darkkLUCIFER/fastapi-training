@@ -1,10 +1,10 @@
-from datetime import datetime
 from typing import Annotated
+from datetime import datetime
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import Field, BaseModel, ConfigDict
 
 
-__all__ = ("CreateTodoSchema", "UpdateTodoSchema", "TodoResponseSchema")
+__all__ = ('CreateTodoSchema', 'UpdateTodoSchema', 'TodoResponseSchema')
 
 
 class CreateTodoSchema(BaseModel):
@@ -14,10 +14,10 @@ class CreateTodoSchema(BaseModel):
 
     model_config = ConfigDict(
         json_schema_extra={
-            "example": {
-                "title": "shop mall",
-                "description": "with ali",
-                "priority": 2,
+            'example': {
+                'title': 'shop mall',
+                'description': 'with ali',
+                'priority': 2,
             }
         }
     )
@@ -31,11 +31,11 @@ class UpdateTodoSchema(BaseModel):
 
     model_config = ConfigDict(
         json_schema_extra={
-            "example": {
-                "title": "shop mall",
-                "description": "with ali",
-                "priority": 2,
-                "completed": True,
+            'example': {
+                'title': 'shop mall',
+                'description': 'with ali',
+                'priority': 2,
+                'completed': True,
             }
         }
     )

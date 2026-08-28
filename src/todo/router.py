@@ -1,22 +1,22 @@
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Path
+from fastapi import Path, Depends, APIRouter, BackgroundTasks
 from starlette import status
 
-from src.todo.dependencies import get_todo_service
-from src.todo.schema import CreateTodoSchema, TodoResponseSchema, UpdateTodoSchema
+from src.todo.schema import CreateTodoSchema, UpdateTodoSchema, TodoResponseSchema
 from src.todo.services import TodoService
+from src.todo.dependencies import get_todo_service
 
 
 router = APIRouter()
 
 
 @router.post(
-    "/",
+    '/',
     response_model=TodoResponseSchema,
     status_code=status.HTTP_201_CREATED,
-    summary="Create a new todo",
-    description="Create a new todo item with title, description, and priority.",
+    summary='Create a new todo',
+    description='Create a new todo item with title, description, and priority.',
 )
 def create_todo(
     data: CreateTodoSchema,
@@ -27,11 +27,11 @@ def create_todo(
 
 
 @router.get(
-    "/",
+    '/',
     response_model=list[TodoResponseSchema],
     status_code=status.HTTP_200_OK,
-    summary="List all todos",
-    description="Retrieve a list of all todo items.",
+    summary='List all todos',
+    description='Retrieve a list of all todo items.',
 )
 def list_todos(
     service: Annotated[TodoService, Depends(get_todo_service)],
@@ -40,11 +40,11 @@ def list_todos(
 
 
 @router.get(
-    "/{todo_id}",
+    '/{todo_id}',
     response_model=TodoResponseSchema,
     status_code=status.HTTP_200_OK,
-    summary="Get a todo by ID",
-    description="Retrieve a single todo item by its ID.",
+    summary='Get a todo by ID',
+    description='Retrieve a single todo item by its ID.',
 )
 def get_todo(
     todo_id: Annotated[int, Path(ge=1)],
@@ -54,11 +54,11 @@ def get_todo(
 
 
 @router.patch(
-    "/{todo_id}",
+    '/{todo_id}',
     response_model=TodoResponseSchema,
     status_code=status.HTTP_200_OK,
-    summary="Update a todo",
-    description="Update a todo item. Only provided fields will be updated.",
+    summary='Update a todo',
+    description='Update a todo item. Only provided fields will be updated.',
 )
 def update_todo(
     todo_id: Annotated[int, Path(ge=1)],
@@ -69,10 +69,10 @@ def update_todo(
 
 
 @router.delete(
-    "/{todo_id}",
+    '/{todo_id}',
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Delete a todo",
-    description="Delete a todo item by its ID.",
+    summary='Delete a todo',
+    description='Delete a todo item by its ID.',
 )
 def delete_todo(
     todo_id: Annotated[int, Path(ge=1)],
