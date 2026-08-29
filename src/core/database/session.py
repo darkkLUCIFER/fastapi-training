@@ -1,12 +1,13 @@
 from collections.abc import Generator
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from src.core.config import settings
 
 
-__all__ = ("get_db", "SessionLocal")
+__all__ = ('get_db', 'SessionLocal')
+
 engine = create_engine(settings.database_url, echo=settings.debug)
 SessionLocal = sessionmaker[Session](
     bind=engine,

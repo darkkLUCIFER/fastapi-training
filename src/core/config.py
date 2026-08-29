@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -8,6 +9,14 @@ class Settings(BaseSettings):
     database_url: str
     debug: bool
     cors_origins: list[str] = ['http://localhost:3000']
+
+    @field_validator('database_url')
+    def validate_database_url(self, v: str) -> str:
+        """Ensure database URL uses PostgreSQL syntax if needed."""
+        if v.startswith('sqlite:///'):
+            # Optionally warn about using SQLite in production
+            print('Warning: Using SQLite!!! For production, use PostgreSQL.')  # noqa
+        return v
 
     model_config = SettingsConfigDict(
         env_file='.env',
