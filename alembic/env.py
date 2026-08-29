@@ -1,12 +1,13 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import pool, engine_from_config
 
 from alembic import context
-from src.core.database import Base
 from src.core import settings
-from src.core.database import models  # noqa: F401  — registers all models on Base.metadata
+from src.core.database import (
+    Base,
+    models,  # noqa: F401  — registers all models on Base.metadata
+)
 
 
 # Import all models so they are registered with Base.metadata
@@ -16,7 +17,7 @@ from src.core.database import models  # noqa: F401  — registers all models on 
 # access to the values within the .ini file in use.
 config = context.config
 config.set_main_option(
-    "sqlalchemy.url",
+    'sqlalchemy.url',
     settings.database_url,
 )
 
@@ -50,12 +51,12 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = config.get_main_option('sqlalchemy.url')
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
+        dialect_opts={'paramstyle': 'named'},
     )
 
     with context.begin_transaction():
@@ -71,7 +72,7 @@ def run_migrations_online() -> None:
     """
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+        prefix='sqlalchemy.',
         poolclass=pool.NullPool,
     )
 

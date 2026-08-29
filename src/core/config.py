@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ['http://localhost:3000']
 
     @field_validator('database_url')
-    def validate_database_url(self, v: str) -> str:
+    @classmethod
+    def validate_database_url(cls, v: str) -> str:
         """Ensure database URL uses PostgreSQL syntax if needed."""
         if v.startswith('sqlite:///'):
             # Optionally warn about using SQLite in production
