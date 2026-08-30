@@ -11,3 +11,6 @@ psycopg2-binary==2.9.*
 # Linter
 pre_commit==4.6.*
 
+# hash
+passlib==1.7.4
+bcrypt==4.3.0
