@@ -6,7 +6,7 @@ from starlette import status
 from src.core import SecurityUtils
 from src.auth.uow import AuthUow
 from src.auth.models import User
-from src.auth.schema import RegisterUserSchema
+from src.auth.schema import RegisterUserSchema, RegisterSuperUserSchema
 
 
 __all__ = ('AuthService',)
@@ -17,7 +17,7 @@ class AuthService:
         self.uow = uow
         self.security = security
 
-    def register_user(self, data: RegisterUserSchema) -> User:
+    def register_user(self, data: RegisterUserSchema | RegisterSuperUserSchema) -> User:
         with self.uow:
             if self._validate_duplicate_user(email=data.email, username=data.username):
                 raise HTTPException(

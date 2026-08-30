@@ -32,3 +32,6 @@ run_local_server:
 
 run_production_server:
 	@fastapi run src/main.py
+
+create_super_user:
+	@python -m scripts.create_admin

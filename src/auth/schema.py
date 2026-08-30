@@ -5,7 +5,7 @@ from pydantic import Field, EmailStr, BaseModel, ConfigDict, StringConstraints, 
 from src.core.exceptions import NotMatchError
 
 
-__all__ = ('RegisterUserSchema', 'RegisterUserResponseSchema')
+__all__ = ('RegisterUserSchema', 'RegisterSuperUserSchema', 'RegisterUserResponseSchema')
 
 Username = Annotated[
     str,
@@ -56,3 +56,29 @@ class RegisterUserResponseSchema(BaseModel):
     email: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class RegisterSuperUserSchema(BaseModel):
+    username: Username
+    email: EmailStr
+    password: Password
+    password_confirmation: Password
+    role: str
+
+    @model_validator(mode='after')
+    def validate_passwords(self):
+        if self.password != self.password_confirmation:
+            raise NotMatchError
+        return self
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'username': 'sorena',
+                'email': 'test@test.com',
+                'password': '12345678',
+                'password_confirmation': '12345678',
+                'role': 'admin',
+            }
+        }
+    )
