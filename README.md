@@ -108,3 +108,27 @@ current:
 history:
     @alembic history --verbose
 ```
+
+
+## ⚠️ Troubleshooting
+
+### Passlib & bcrypt Version Compatibility
+
+If you are using `passlib==1.7.4` with a recent version of `bcrypt` (especially `bcrypt==5.x`), you may encounter the following error when hashing or verifying passwords:
+
+```text
+ValueError: password cannot be longer than 72 bytes, truncate manually if necessary
+```
+
+This issue is caused by a compatibility problem between passlib==1.7.4 and newer versions of bcrypt.
+To fix this issue, use the following compatible versions:
+
+```bash
+passlib==1.7.4
+bcrypt==4.3.0
+```
+
+If you already have an incompatible version of bcrypt installed, you can install the compatible version with:
+```bash
+pip install "bcrypt==4.3.0"
+```
