@@ -1,0 +1,31 @@
+from typing import Any
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from src.auth.models import User
+
+
+__all__ = ('AuthRepository',)
+
+
+class AuthRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def create(self, user: User) -> User:
+        self.db.add(user)
+        return user
+
+    def get_all(self) -> list[User]:
+        return self.db.query(User).all()  # noqa
+
+    def get_one(self, user_id: int) -> User | None:
+        return self.db.query(User).filter(User.id == user_id).first()  # noqa
+
+    def delete(self, user: User) -> None:
+        self.db.delete(user)
+
+    def exists(self, **filters: Any) -> bool:
+        stmt = select(User.id).filter_by(**filters)
+        return bool(self.db.scalar(select(stmt.exists())))
