@@ -14,3 +14,10 @@ pre_commit==4.6.*
 # hash
 passlib==1.7.4
 bcrypt==4.3.0
+
+# jwt
+PyJWT[crypto]
+
+
+# other
+python-multipart==0.0.12

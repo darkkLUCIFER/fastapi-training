@@ -132,3 +132,8 @@ If you already have an incompatible version of bcrypt installed, you can install
 ```bash
 pip install "bcrypt==4.3.0"
 ```
+
+If you want to generate random secret_key for jwt, you can use below
+```bash
+openssl rand -hex 32
+```

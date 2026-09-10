@@ -2,10 +2,18 @@ from typing import Annotated
 
 from pydantic import Field, EmailStr, BaseModel, ConfigDict, StringConstraints, model_validator
 
+from src.core import settings
 from src.core.exceptions import NotMatchError
 
 
-__all__ = ('RegisterUserSchema', 'RegisterSuperUserSchema', 'RegisterUserResponseSchema')
+__all__ = (
+    'LoginUserSchema',
+    'TokenUserSchema',
+    'RefreshTokenSchema',
+    'RegisterUserSchema',
+    'RegisterSuperUserSchema',
+    'RegisterUserResponseSchema',
+)
 
 Username = Annotated[
     str,
@@ -82,3 +90,18 @@ class RegisterSuperUserSchema(BaseModel):
             }
         }
     )
+
+
+class LoginUserSchema(BaseModel):
+    username: Username
+    password: Password
+
+
+class TokenUserSchema(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = settings.jwt_token_location
+
+
+class RefreshTokenSchema(BaseModel):
+    refresh_token: str

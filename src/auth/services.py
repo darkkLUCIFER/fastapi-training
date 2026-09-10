@@ -1,12 +1,14 @@
 from typing import Any
 
+import jwt
 from fastapi import HTTPException
 from starlette import status
 
-from src.core import SecurityUtils
+from src.core import NotMatchError, SecurityUtils
 from src.auth.uow import AuthUow
 from src.auth.models import User
-from src.auth.schema import RegisterUserSchema, RegisterSuperUserSchema
+from src.auth.schema import LoginUserSchema, TokenUserSchema, RegisterUserSchema, RegisterSuperUserSchema
+from src.core.config import settings
 
 
 __all__ = ('AuthService',)
@@ -37,3 +39,50 @@ class AuthService:
 
     def _validate_duplicate_user(self, **filters: Any) -> bool:
         return self.uow.repository.exists(**filters)
+
+    def login_user(self, data: LoginUserSchema) -> TokenUserSchema:
+        user = self.uow.repository.get_by_username(username=data.username)
+        if not user or not self.security.verify_password(data.password, user.hashed_password):
+            raise NotMatchError
+
+        role = getattr(user.role, 'value', user.role)
+        access_token = self.security.create_access_token(
+            subject=str(user.id),
+            extra_claims={'username': user.username, 'role': role},
+        )
+        refresh_token = self.security.create_refresh_token(subject=str(user.id))
+        return TokenUserSchema(
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
+
+    def refresh_tokens(self, refresh_token: str) -> TokenUserSchema:
+        try:
+            payload = self.security.decode_token(refresh_token)
+        except jwt.PyJWTError as exc:
+            raise NotMatchError from exc
+
+        if payload.get('type') != 'refresh':
+            raise NotMatchError
+
+        jti = payload.get('jti', '')
+        if settings.jwt_refresh_rotation and self.security.is_refresh_revoked(jti):
+            raise NotMatchError
+
+        user = self.uow.repository.get_one(user_id=int(payload['sub']))
+        if not user or not user.is_active:
+            raise NotMatchError
+
+        if settings.jwt_refresh_rotation and jti:
+            self.security.revoke_refresh_token(jti)
+
+        role = getattr(user.role, 'value', user.role)
+        new_access = self.security.create_access_token(
+            subject=str(user.id),
+            extra_claims={'username': user.username, 'role': role},
+        )
+        if settings.jwt_refresh_rotation:
+            new_refresh = self.security.create_refresh_token(subject=str(user.id))
+        else:
+            new_refresh = refresh_token
+        return TokenUserSchema(access_token=new_access, refresh_token=new_refresh)

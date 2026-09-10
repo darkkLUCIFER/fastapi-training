@@ -9,6 +9,12 @@ class Settings(BaseSettings):
     database_url: str
     debug: bool
     cors_origins: list[str] = ['http://localhost:3000']
+    jwt_secret_key: str
+    jwt_algorithm: str = 'HS256'
+    jwt_access_token_expire_minutes: int = 30
+    jwt_refresh_token_expire_days: int = 7
+    jwt_refresh_rotation: bool = True
+    jwt_token_location: str = 'Bearer'
 
     @field_validator('database_url')
     @classmethod

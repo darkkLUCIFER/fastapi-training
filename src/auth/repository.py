@@ -18,10 +18,10 @@ class AuthRepository:
         return user
 
     def get_all(self) -> list[User]:
-        return self.db.query(User).all()  # noqa
+        return self.db.query(User).all()  # NOQA
 
     def get_one(self, user_id: int) -> User | None:
-        return self.db.query(User).filter(User.id == user_id).first()  # noqa
+        return self.db.query(User).filter(User.id == user_id).first()  # NOQA
 
     def delete(self, user: User) -> None:
         self.db.delete(user)
@@ -29,3 +29,6 @@ class AuthRepository:
     def exists(self, **filters: Any) -> bool:
         stmt = select(User.id).filter_by(**filters)
         return bool(self.db.scalar(select(stmt.exists())))
+
+    def get_by_username(self, username: str) -> User | None:
+        return self.db.query(User).filter(User.username == username).first()  # NOQA
