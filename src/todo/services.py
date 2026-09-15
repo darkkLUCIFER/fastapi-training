@@ -5,6 +5,7 @@ from src.todo.email import EmailService
 from src.auth.models import User
 from src.todo.models import Todo
 from src.todo.schema import CreateTodoSchema, UpdateTodoSchema
+from src.auth.constants import RoleChoices
 from src.core.exceptions import NotFoundError
 
 
@@ -32,8 +33,10 @@ class TodoService:
         background_tasks.add_task(self.email.send_created, todo)
         return todo
 
-    def get_all(self) -> list[Todo]:
-        return self.uow.repository.get_all()
+    def get_all(self, user) -> list[Todo]:
+        if user.role == RoleChoices.ADMIN:
+            return self.uow.repository.get_all()
+        return self.uow.repository.get_all_user_todos(user_id=user.id)
 
     def get_one(self, todo_id: int) -> Todo:
         return self._get_todo_or_raise(todo_id)

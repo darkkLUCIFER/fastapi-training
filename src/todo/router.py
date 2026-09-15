@@ -38,8 +38,9 @@ def create_todo(
 )
 def list_todos(
     service: Annotated[TodoService, Depends(get_todo_service)],
+    user: Annotated[User, Depends(get_current_user)],
 ):
-    return service.get_all()
+    return service.get_all(user)
 
 
 @router.get(

@@ -15,10 +15,13 @@ class TodoRepository:
         return todo
 
     def get_all(self) -> list[Todo]:
-        return self.db.query(Todo).all()  # noqa
+        return self.db.query(Todo).all()  # Noqa
 
     def get_one(self, todo_id: int) -> Todo | None:
-        return self.db.query(Todo).filter(Todo.id == todo_id).first()  # noqa
+        return self.db.query(Todo).filter(Todo.id == todo_id).first()  # Noqa
 
     def delete(self, todo: Todo) -> None:
         self.db.delete(todo)
+
+    def get_all_user_todos(self, user_id: int) -> list[Todo]:
+        return self.db.query(Todo).filter(Todo.owner_id == user_id).all()  # Noqa
