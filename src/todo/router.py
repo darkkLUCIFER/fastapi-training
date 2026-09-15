@@ -3,8 +3,10 @@ from typing import Annotated
 from fastapi import Path, Depends, APIRouter, BackgroundTasks
 from starlette import status
 
+from src.auth.models import User
 from src.todo.schema import CreateTodoSchema, UpdateTodoSchema, TodoResponseSchema
 from src.todo.services import TodoService
+from src.auth.dependencies import get_current_user
 from src.todo.dependencies import get_todo_service
 
 
@@ -22,8 +24,9 @@ def create_todo(
     data: CreateTodoSchema,
     background_tasks: BackgroundTasks,
     service: Annotated[TodoService, Depends(get_todo_service)],
+    user: Annotated[User, Depends(get_current_user)],
 ):
-    return service.create(data, background_tasks)
+    return service.create(data, background_tasks, user)
 
 
 @router.get(

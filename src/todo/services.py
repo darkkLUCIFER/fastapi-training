@@ -2,6 +2,7 @@ from fastapi import BackgroundTasks
 
 from src.todo.uow import TodoUow
 from src.todo.email import EmailService
+from src.auth.models import User
 from src.todo.models import Todo
 from src.todo.schema import CreateTodoSchema, UpdateTodoSchema
 from src.core.exceptions import NotFoundError
@@ -21,9 +22,10 @@ class TodoService:
             raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
         return todo
 
-    def create(self, data: CreateTodoSchema, background_tasks: BackgroundTasks) -> Todo:
+    def create(self, data: CreateTodoSchema, background_tasks: BackgroundTasks, user: User) -> Todo:
         with self.uow:
             todo = Todo(**data.model_dump())
+            todo.owner_id = user.id
             self.uow.repository.create(todo)
             self.uow.commit()
             self.uow.refresh(todo)
