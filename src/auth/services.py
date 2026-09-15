@@ -9,6 +9,7 @@ from src.auth.uow import AuthUow
 from src.auth.models import User
 from src.auth.schema import LoginUserSchema, TokenUserSchema, RegisterUserSchema, RegisterSuperUserSchema
 from src.core.config import settings
+from src.auth.constants import RoleChoices
 
 
 __all__ = ('AuthService',)
@@ -26,12 +27,19 @@ class AuthService:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail='duplicate user exists',
                 )
-
-            user = User(
-                email=data.email,
-                username=data.username,
-                hashed_password=self.security.hash_password(data.password),
-            )
+            if isinstance(data, RegisterSuperUserSchema):
+                user = User(
+                    email=data.email,
+                    username=data.username,
+                    hashed_password=self.security.hash_password(data.password),
+                    role=RoleChoices(data.role),
+                )
+            else:
+                user = User(
+                    email=data.email,
+                    username=data.username,
+                    hashed_password=self.security.hash_password(data.password),
+                )
             self.uow.repository.create(user)
             self.uow.commit()
             self.uow.refresh(user)
