@@ -20,6 +20,9 @@ class TodoRepository:
     def get_one(self, todo_id: int) -> Todo | None:
         return self.db.query(Todo).filter(Todo.id == todo_id).first()  # Noqa
 
+    def get_one_with_owner_check(self, todo_id: int, user_id: int) -> Todo | None:
+        return self.db.query(Todo).filter(Todo.id == todo_id, Todo.owner_id == user_id).first()  # Noqa
+
     def delete(self, todo: Todo) -> None:
         self.db.delete(todo)
 

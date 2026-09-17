@@ -17,8 +17,11 @@ class TodoService:
         self.uow = uow
         self.email = email
 
-    def _get_todo_or_raise(self, todo_id: int) -> Todo:
-        todo = self.uow.repository.get_one(todo_id=todo_id)
+    def _get_todo_or_raise(self, todo_id: int, user_id: int | None = None) -> Todo:
+        if not user_id:
+            todo = self.uow.repository.get_one(todo_id=todo_id)
+        else:
+            todo = self.uow.repository.get_one_with_owner_check(todo_id=todo_id, user_id=user_id)
         if not todo:
             raise NotFoundError(object_id=todo_id, model_name=Todo.__name__)
         return todo
@@ -38,8 +41,10 @@ class TodoService:
             return self.uow.repository.get_all()
         return self.uow.repository.get_all_user_todos(user_id=user.id)
 
-    def get_one(self, todo_id: int) -> Todo:
-        return self._get_todo_or_raise(todo_id)
+    def get_one(self, todo_id: int, user: User) -> Todo:
+        if user.role == RoleChoices.ADMIN:
+            return self._get_todo_or_raise(todo_id)
+        return self._get_todo_or_raise(todo_id=todo_id, user_id=user.id)
 
     def update_one(self, todo_id: int, data: UpdateTodoSchema) -> Todo:
         with self.uow:
