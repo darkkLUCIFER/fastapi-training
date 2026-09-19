@@ -83,5 +83,6 @@ def update_todo(
 def delete_todo(
     todo_id: Annotated[int, Path(ge=1)],
     service: Annotated[TodoService, Depends(get_todo_service)],
+    user: Annotated[User, Depends(get_current_user)],
 ):
-    return service.delete_one(todo_id=todo_id)
+    return service.delete_one(todo_id=todo_id, user=user)

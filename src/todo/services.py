@@ -58,8 +58,11 @@ class TodoService:
             self.uow.refresh(todo)
         return todo
 
-    def delete_one(self, todo_id: int) -> None:
+    def delete_one(self, todo_id: int, user: User) -> None:
         with self.uow:
-            todo = self._get_todo_or_raise(todo_id)
+            if user.role == RoleChoices.ADMIN:
+                todo = self._get_todo_or_raise(todo_id)
+            else:
+                todo = self._get_todo_or_raise(todo_id, user_id=user.id)
             self.uow.repository.delete(todo)
             self.uow.commit()
