@@ -46,9 +46,12 @@ class TodoService:
             return self._get_todo_or_raise(todo_id)
         return self._get_todo_or_raise(todo_id=todo_id, user_id=user.id)
 
-    def update_one(self, todo_id: int, data: UpdateTodoSchema) -> Todo:
+    def update_one(self, todo_id: int, data: UpdateTodoSchema, user: User) -> Todo:
         with self.uow:
-            todo = self._get_todo_or_raise(todo_id)
+            if user.role == RoleChoices.ADMIN:
+                todo = self._get_todo_or_raise(todo_id)
+            else:
+                todo = self._get_todo_or_raise(todo_id, user_id=user.id)
             for field, value in data.model_dump(exclude_unset=True).items():
                 setattr(todo, field, value)
             self.uow.commit()

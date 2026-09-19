@@ -69,8 +69,9 @@ def update_todo(
     todo_id: Annotated[int, Path(ge=1)],
     service: Annotated[TodoService, Depends(get_todo_service)],
     data: UpdateTodoSchema,
+    user: Annotated[User, Depends(get_current_user)],
 ):
-    return service.update_one(todo_id=todo_id, data=data)
+    return service.update_one(todo_id=todo_id, data=data, user=user)
 
 
 @router.delete(
