@@ -1,9 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { todos } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import AddTodo from './AddTodo';
 import TodoItem from './TodoItem';
+
+// Debounce utility function
+const debounce = (func, delay) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+};
 
 export default function TodoList() {
   const { logout, user } = useAuth();
@@ -12,35 +21,121 @@ export default function TodoList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchTodos = async () => {
+  // Refs for abort controllers
+  const fetchTodosAbortController = useRef(null);
+  const addTodoAbortController = useRef(null);
+  const updateTodoAbortController = useRef(null);
+  const deleteTodoAbortController = useRef(null);
+
+  // Debounced fetchTodos function
+  const debouncedFetchTodos = debounce(async () => {
+    // Cancel previous request if it exists
+    if (fetchTodosAbortController.current) {
+      fetchTodosAbortController.current.abort();
+    }
+
+    const controller = new AbortController();
+    fetchTodosAbortController.current = controller;
+
     try {
-      const data = await todos.list();
+      setLoading(true);
+      setError('');
+      const data = await todos.list({ signal: controller.signal });
       setTodoList(data);
     } catch (err) {
-      setError(err.message);
+      if (err.name !== 'AbortError') {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
+      fetchTodosAbortController.current = null;
+    }
+  }, 300); // 300ms debounce delay
+
+  const addTodo = async (data) => {
+    // Cancel previous request if it exists
+    if (addTodoAbortController.current) {
+      addTodoAbortController.current.abort();
+    }
+
+    const controller = new AbortController();
+    addTodoAbortController.current = controller;
+
+    try {
+      const newTodo = await todos.create(data, { signal: controller.signal });
+      setTodoList([newTodo, ...todoList]);
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setError(err.message);
+      }
+    } finally {
+      addTodoAbortController.current = null;
     }
   };
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
-
-  const addTodo = async (data) => {
-    const newTodo = await todos.create(data);
-    setTodoList([newTodo, ...todoList]);
-  };
-
   const updateTodo = async (id, data) => {
-    const updated = await todos.update(id, data);
-    setTodoList(todoList.map((t) => (t.id === id ? updated : t)));
+    // Cancel previous request if it exists
+    if (updateTodoAbortController.current) {
+      updateTodoAbortController.current.abort();
+    }
+
+    const controller = new AbortController();
+    updateTodoAbortController.current = controller;
+
+    try {
+      const updated = await todos.update(id, data, user, { signal: controller.signal });
+      setTodoList(todoList.map((t) => (t.id === id ? updated : t)));
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setError(err.message);
+      }
+    } finally {
+      updateTodoAbortController.current = null;
+    }
   };
 
   const deleteTodo = async (id) => {
-    await todos.delete(id);
-    setTodoList(todoList.filter((t) => t.id !== id));
+    // Cancel previous request if it exists
+    if (deleteTodoAbortController.current) {
+      deleteTodoAbortController.current.abort();
+    }
+
+    const controller = new AbortController();
+    deleteTodoAbortController.current = controller;
+
+    try {
+      await todos.delete(id, user, { signal: controller.signal });
+      setTodoList(todoList.filter((t) => t.id !== id));
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setError(err.message);
+      }
+    } finally {
+      deleteTodoAbortController.current = null;
+    }
   };
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      if (fetchTodosAbortController.current) {
+        fetchTodosAbortController.current.abort();
+      }
+      if (addTodoAbortController.current) {
+        addTodoAbortController.current.abort();
+      }
+      if (updateTodoAbortController.current) {
+        updateTodoAbortController.current.abort();
+      }
+      if (deleteTodoAbortController.current) {
+        deleteTodoAbortController.current.abort();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    debouncedFetchTodos();
+  }, []);
 
   return (
     <div className="todo-app">
@@ -52,7 +147,7 @@ export default function TodoList() {
             onClick={toggleTheme}
             title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
-            {theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19'}
+            {theme === 'dark' ? '☀️' : '🌙'}
           </button>
           <div className="user-info">
             <div className="user-avatar">
@@ -69,7 +164,7 @@ export default function TodoList() {
         <p className="loading">Loading tasks...</p>
       ) : todoList.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-icon">&#9744;</div>
+          <div className="empty-icon">📝</div>
           <p>No tasks yet</p>
           <p className="empty-hint">Create your first task above to get started</p>
         </div>
@@ -81,6 +176,7 @@ export default function TodoList() {
               todo={todo}
               onUpdate={updateTodo}
               onDelete={deleteTodo}
+              user={user}
             />
           ))}
         </ul>

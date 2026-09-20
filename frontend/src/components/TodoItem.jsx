@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function formatDate(iso) {
   const d = new Date(iso);
@@ -11,18 +11,26 @@ function formatDate(iso) {
   });
 }
 
-export default function TodoItem({ todo, onUpdate, onDelete }) {
+export default function TodoItem({ todo, onUpdate, onDelete, user }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(todo.title);
   const [description, setDescription] = useState(todo.description || '');
+  const [priority, setPriority] = useState(todo.priority || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Initialize state with todo data
+  useEffect(() => {
+    setTitle(todo.title);
+    setDescription(todo.description || '');
+    setPriority(todo.priority || '');
+  }, [todo]);
 
   const handleToggle = async () => {
     setError('');
     setLoading(true);
     try {
-      await onUpdate(todo.id, { completed: !todo.completed });
+      await onUpdate(todo.id, { completed: !todo.completed }, user);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -34,13 +42,19 @@ export default function TodoItem({ todo, onUpdate, onDelete }) {
     setError('');
     setLoading(true);
     try {
-      await onUpdate(todo.id, {
+      // Convert empty string to null for priority
+      const priorityValue = priority === '' ? null : Number(priority);
+
+      const updateData = {
         title,
         description: description || null,
-      });
+        priority: priorityValue,
+      };
+
+      await onUpdate(todo.id, updateData, user);
       setEditing(false);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to update todo');
     } finally {
       setLoading(false);
     }
@@ -49,6 +63,7 @@ export default function TodoItem({ todo, onUpdate, onDelete }) {
   const handleCancel = () => {
     setTitle(todo.title);
     setDescription(todo.description || '');
+    setPriority(todo.priority || '');
     setEditing(false);
   };
 
@@ -66,7 +81,7 @@ export default function TodoItem({ todo, onUpdate, onDelete }) {
     setError('');
     setLoading(true);
     try {
-      await onDelete(todo.id);
+      await onDelete(todo.id, user);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -100,7 +115,20 @@ export default function TodoItem({ todo, onUpdate, onDelete }) {
             {todo.title}
           </span>
         )}
-        {todo.priority && (
+        {editing ? (
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            className="priority-edit"
+          >
+            <option value="">No Priority</option>
+            <option value="1">1 - Low</option>
+            <option value="2">2 - Below Medium</option>
+            <option value="3">3 - Medium</option>
+            <option value="4">4 - Above Medium</option>
+            <option value="5">5 - High</option>
+          </select>
+        ) : (
           <span className={`priority priority-${todo.priority}`}>P{todo.priority}</span>
         )}
         <div className="actions">

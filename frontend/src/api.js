@@ -24,6 +24,7 @@ async function request(endpoint, options = {}) {
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers,
+    signal: options.signal,
   });
 
   if (response.status === 401 || response.status === 403) {
@@ -60,8 +61,23 @@ export const auth = {
 };
 
 export const todos = {
-  list: () => request('/todo/'),
-  create: (data) => request('/todo/', { method: 'POST', body: JSON.stringify(data) }),
-  update: (id, data) => request(`/todo/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
-  delete: (id) => request(`/todo/${id}/`, { method: 'DELETE' }),
+  list: (options = {}) => request('/todo/', options),
+  create: (data, options = {}) => request('/todo/', { method: 'POST', body: JSON.stringify(data), ...options }),
+  update: (id, data, user, options = {}) => request(`/todo/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+    headers: {
+      'X-User-Id': user.id,
+      'X-User-Role': user.role,
+    },
+    ...options
+  }),
+  delete: (id, user, options = {}) => request(`/todo/${id}/`, {
+    method: 'DELETE',
+    headers: {
+      'X-User-Id': user.id,
+      'X-User-Role': user.role,
+    },
+    ...options
+  }),
 };
