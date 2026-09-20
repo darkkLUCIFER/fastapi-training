@@ -6,16 +6,25 @@ from starlette import status
 from sqlalchemy.orm import Session
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from src.core import SecurityUtils
-from src.auth.uow import AuthUow
+from src.core import SecurityUtils, PermissionDenied
+from src.auth.uow import AuthUow, RolePermissionUow
+from src.auth.models import User
 from src.auth.schema import LoginUserSchema
 from src.core.config import settings
-from src.auth.services import AuthService
+from src.auth.services import AuthService, AuthorizationService
 from src.core.dependencies import get_security_utils
 from src.core.database.session import get_db
+from src.auth.constants.permission import PermissionChoices
 
 
-__all__ = ('get_auth_service', 'get_current_user', 'get_current_payload', 'login_user_form_schema')
+__all__ = (
+    'get_auth_service',
+    'get_current_user',
+    'RequirePermission',
+    'get_current_payload',
+    'login_user_form_schema',
+    'get_authorization_service',
+)
 
 bearer_scheme = HTTPBearer(auto_error=True)
 
@@ -71,3 +80,22 @@ def get_current_user(
             detail='User not found or inactive',
         )
     return user
+
+
+def get_authorization_service(db: Annotated[Session, Depends(get_db)]) -> AuthorizationService:
+    return AuthorizationService(uow=RolePermissionUow(db))
+
+
+class RequirePermission:
+    def __init__(self, permission: PermissionChoices):
+        self.permission = permission
+
+    def __call__(
+        self,
+        current_user: Annotated[User, Depends(get_current_user)],
+        authorization_service: Annotated[AuthorizationService, Depends(get_authorization_service)],
+    ) -> None:
+        allowed = authorization_service.has_permission(user=current_user, permission=self.permission)
+
+        if not allowed:
+            raise PermissionDenied

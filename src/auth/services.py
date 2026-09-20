@@ -5,14 +5,15 @@ from fastapi import HTTPException
 from starlette import status
 
 from src.core import NotMatchError, SecurityUtils
-from src.auth.uow import AuthUow
+from src.auth.uow import AuthUow, RolePermissionUow
 from src.auth.models import User
 from src.auth.schema import LoginUserSchema, TokenUserSchema, RegisterUserSchema, RegisterSuperUserSchema
 from src.core.config import settings
 from src.auth.constants import RoleChoices
+from src.auth.constants.permission import PermissionChoices
 
 
-__all__ = ('AuthService',)
+__all__ = ('AuthService', 'AuthorizationService')
 
 
 class AuthService:
@@ -94,3 +95,35 @@ class AuthService:
         else:
             new_refresh = refresh_token
         return TokenUserSchema(access_token=new_access, refresh_token=new_refresh)
+
+
+class AuthorizationService:
+    def __init__(self, uow: RolePermissionUow):
+        self.uow = uow
+
+    def get_permissions(self, user: User) -> frozenset[PermissionChoices] | None:
+        # TODO(MAHDI): save the result for user in cache with ttl and also handle invalidation
+        # for using cache also add version to model and check with version
+        # if you dont want to invalidate cache in every where
+        #
+        # model:
+        # User
+        # ─────────────
+        # id
+        # permission_version
+        #
+        # cache in redis:
+        # authz:user:123
+        # {
+        #     "version": 17,
+        #     "permissions": [...]
+        # }
+        with self.uow:
+            all_permissions = self.uow.repository.get_all_for_user(role=user.role)
+            return frozenset(all_permissions) if all_permissions else None
+
+    def has_permission(self, user: User, permission: PermissionChoices):
+        permissions = self.get_permissions(user=user)
+        if not permissions:
+            return False
+        return permission in permissions

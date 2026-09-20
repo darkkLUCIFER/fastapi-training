@@ -1,4 +1,8 @@
-__all__ = ('NotFoundError', 'NotMatchError')
+__all__ = (
+    'NotFoundError',
+    'NotMatchError',
+    'PermissionDenied',
+)
 
 
 class NotFoundError(Exception):
@@ -11,3 +15,8 @@ class NotFoundError(Exception):
 class NotMatchError(Exception):
     def __init__(self):
         super().__init__('Input data does not match')
+
+
+class PermissionDenied(Exception):
+    def __init__(self):
+        super().__init__('Permission denied')

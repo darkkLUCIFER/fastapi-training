@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.auth.models import User
+from src.auth.models import User, RolePermission
 
 
 __all__ = ('AuthRepository',)
@@ -32,3 +32,13 @@ class AuthRepository:
 
     def get_by_username(self, username: str) -> User | None:
         return self.db.query(User).filter(User.username == username).first()  # NOQA
+
+
+class RolePermissionRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_all_for_user(self, role: str) -> list[str]:
+        columns = [RolePermission.permission_id.op('->')('key')]
+        rows = self.db.query(*columns).filter(RolePermission.role == role).all()  # NOQA
+        return [r[0] for r in rows]
