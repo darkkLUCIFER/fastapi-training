@@ -9,7 +9,7 @@ __all__ = ('PermissionChoices',)
 class PermissionChoices(ChoiceEnum):
     TODO_LIST_VIEW = 'todo.list.view', _('todo.list.view')
     TODO_CREATE = 'todo.create', _('todo.create')
-    TODO_DETAIL = 'todo.detail', _('todo.detail')
+    TODO_DETAIL = 'todo.detail.view', _('todo.detail.view')
     TODO_UPDATE = 'todo.update', _('todo.update')
     TODO_DELETE = 'todo.delete', _('todo.delete')
 

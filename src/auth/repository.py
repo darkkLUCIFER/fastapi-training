@@ -1,12 +1,17 @@
 from typing import Any
+from collections.abc import Collection
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import insert
 
-from src.auth.models import User, RolePermission
+from src.auth.models import User, Permission, RolePermission
 
 
-__all__ = ('AuthRepository',)
+__all__ = (
+    'AuthRepository',
+    'PermissionRepository',
+)
 
 
 class AuthRepository:
@@ -42,3 +47,24 @@ class RolePermissionRepository:
         columns = [RolePermission.permission_id.op('->')('key')]
         rows = self.db.query(*columns).filter(RolePermission.role == role).all()  # NOQA
         return [r[0] for r in rows]
+
+
+class PermissionRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def create_missing_permissions(self, keys: Collection[str]) -> int:
+        if not keys:
+            return 0
+        statement = (
+            insert(Permission)
+            .values([{'key': key} for key in keys])
+            .on_conflict_do_nothing(
+                index_elements=[Permission.key],
+            )
+        )
+
+        result = self.db.execute(statement)
+        self.db.commit()
+
+        return result.rowcount  # NOQA

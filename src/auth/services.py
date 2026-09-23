@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from starlette import status
 
 from src.core import NotMatchError, SecurityUtils
-from src.auth.uow import AuthUow, RolePermissionUow
+from src.auth.uow import AuthUow, PermissionUow, RolePermissionUow
 from src.auth.models import User
 from src.auth.schema import LoginUserSchema, TokenUserSchema, RegisterUserSchema, RegisterSuperUserSchema
 from src.core.config import settings
@@ -13,7 +13,11 @@ from src.auth.constants import RoleChoices
 from src.auth.constants.permission import PermissionChoices
 
 
-__all__ = ('AuthService', 'AuthorizationService')
+__all__ = (
+    'AuthService',
+    'AuthorizationService',
+    'PermissionSyncService',
+)
 
 
 class AuthService:
@@ -127,3 +131,12 @@ class AuthorizationService:
         if not permissions:
             return False
         return permission in permissions
+
+
+class PermissionSyncService:
+    def __init__(self, uow: PermissionUow):
+        self.uow = uow
+
+    def sync(self) -> int:
+        keys = {permission.value for permission in PermissionChoices}
+        return self.uow.repository.create_missing_permissions(keys)
