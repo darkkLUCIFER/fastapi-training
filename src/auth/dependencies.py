@@ -7,10 +7,10 @@ from sqlalchemy.orm import Session
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from src.core import SecurityUtils
-from src.auth.uow import AuthUow, RolePermissionUow
+from src.auth.uow import AuthUow, PermissionUow, RolePermissionUow
 from src.auth.schema import LoginUserSchema
 from src.core.config import settings
-from src.auth.services import AuthService, AuthorizationService
+from src.auth.services import AuthService, PermissionService, AuthorizationService
 from src.core.dependencies import get_security_utils
 from src.core.database.session import get_db
 
@@ -20,6 +20,7 @@ __all__ = (
     'get_current_user',
     'get_current_payload',
     'login_user_form_schema',
+    'get_permission_service',
     'get_authorization_service',
 )
 
@@ -81,3 +82,7 @@ def get_current_user(
 
 def get_authorization_service(db: Annotated[Session, Depends(get_db)]) -> AuthorizationService:
     return AuthorizationService(uow=RolePermissionUow(db))
+
+
+def get_permission_service(db: Annotated[Session, Depends(get_db)]) -> PermissionService:
+    return PermissionService(uow=PermissionUow(db))

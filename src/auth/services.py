@@ -13,11 +13,7 @@ from src.auth.constants import RoleChoices
 from src.auth.constants.permission import PermissionChoices
 
 
-__all__ = (
-    'AuthService',
-    'AuthorizationService',
-    'PermissionSyncService',
-)
+__all__ = ('AuthService', 'PermissionService', 'AuthorizationService', 'PermissionSyncService')
 
 
 class AuthService:
@@ -140,3 +136,12 @@ class PermissionSyncService:
     def sync(self) -> int:
         keys = {permission.value for permission in PermissionChoices}
         return self.uow.repository.create_missing_permissions(keys)
+
+
+class PermissionService:
+    def __init__(self, uow: PermissionUow):
+        self.uow = uow
+
+    def list_all_permissions(self):
+        with self.uow:
+            return self.uow.repository.get_all_permissions()

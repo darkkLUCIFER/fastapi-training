@@ -68,3 +68,6 @@ class PermissionRepository:
         self.db.commit()
 
         return result.rowcount  # NOQA
+
+    def get_all_permissions(self) -> list[Permission]:
+        return self.db.query(Permission).all()  # NOQA

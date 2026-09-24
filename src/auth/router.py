@@ -9,10 +9,12 @@ from src.auth.schema import (
     TokenUserSchema,
     RefreshTokenSchema,
     RegisterUserSchema,
+    PermissionListSchema,
     RegisterUserResponseSchema,
 )
-from src.auth.services import AuthService
-from src.auth.dependencies import get_auth_service, get_current_user, login_user_form_schema
+from src.auth.services import AuthService, PermissionService
+from src.auth.permission import RequirePermission
+from src.auth.dependencies import get_auth_service, get_current_user, get_permission_service, login_user_form_schema
 
 
 router = APIRouter()
@@ -65,3 +67,15 @@ def refresh(
 )
 def get_me(user: Annotated[User, Depends(get_current_user)]):
     return {'id': user.id, 'username': user.username, 'role': user.role}
+
+
+@router.get(
+    '/permissions/',
+    status_code=status.HTTP_200_OK,
+    summary='Permissions List',
+    description='List of all permissions',
+    dependencies=[Depends(RequirePermission)],
+    response_model=list[PermissionListSchema],
+)
+def permission_list(service: Annotated[PermissionService, Depends(get_permission_service)]):
+    return service.list_all_permissions()

@@ -11,6 +11,7 @@ __all__ = (
     'TokenUserSchema',
     'RefreshTokenSchema',
     'RegisterUserSchema',
+    'PermissionListSchema',
     'RegisterSuperUserSchema',
     'RegisterUserResponseSchema',
 )
@@ -105,3 +106,10 @@ class TokenUserSchema(BaseModel):
 
 class RefreshTokenSchema(BaseModel):
     refresh_token: str
+
+
+class PermissionListSchema(BaseModel):
+    id: int
+    key: str
+    description: str
+    is_active: bool
