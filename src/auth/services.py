@@ -6,8 +6,14 @@ from starlette import status
 
 from src.core import NotMatchError, SecurityUtils
 from src.auth.uow import AuthUow, PermissionUow, RolePermissionUow
-from src.auth.models import User
-from src.auth.schema import LoginUserSchema, TokenUserSchema, RegisterUserSchema, RegisterSuperUserSchema
+from src.auth.models import User, Permission
+from src.auth.schema import (
+    LoginUserSchema,
+    TokenUserSchema,
+    RegisterUserSchema,
+    RegisterSuperUserSchema,
+    CreateRolePermissionSchema,
+)
 from src.core.config import settings
 from src.auth.constants import RoleChoices
 from src.auth.constants.permission import PermissionChoices
@@ -149,3 +155,6 @@ class PermissionService:
     def list_all_permissions(self):
         with self.uow:
             return self.uow.repository.get_all_permissions()
+
+    def create_permission(self, data: CreateRolePermissionSchema) -> Permission:
+        pass

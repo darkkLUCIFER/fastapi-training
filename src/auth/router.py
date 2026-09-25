@@ -10,11 +10,13 @@ from src.auth.schema import (
     RefreshTokenSchema,
     RegisterUserSchema,
     PermissionListSchema,
+    CreateRolePermissionSchema,
     RegisterUserResponseSchema,
 )
 from src.auth.services import AuthService, PermissionService
 from src.auth.permission import RequirePermission
 from src.auth.dependencies import get_auth_service, get_current_user, get_permission_service, login_user_form_schema
+from src.auth.constants.permission import PermissionChoices
 
 
 router = APIRouter()
@@ -74,8 +76,21 @@ def get_me(user: Annotated[User, Depends(get_current_user)]):
     status_code=status.HTTP_200_OK,
     summary='Permissions List',
     description='List of all permissions',
-    dependencies=[Depends(RequirePermission)],
+    dependencies=[Depends(RequirePermission(PermissionChoices.PERMISSION_LIST_VIEW))],
     response_model=list[PermissionListSchema],
 )
 def permission_list(service: Annotated[PermissionService, Depends(get_permission_service)]):
     return service.list_all_permissions()
+
+
+@router.post(
+    'permissions/create/',
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(RequirePermission)],
+    summary='Create permission',
+    description='Create permission with role admin',
+)
+def create_permission(
+    service: Annotated[PermissionService, Depends(get_permission_service)], data: CreateRolePermissionSchema
+):
+    return service.create_permission(data=data)
