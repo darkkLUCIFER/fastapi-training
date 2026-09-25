@@ -111,5 +111,5 @@ class RefreshTokenSchema(BaseModel):
 class PermissionListSchema(BaseModel):
     id: int
     key: str
-    description: str
+    description: str | None
     is_active: bool
