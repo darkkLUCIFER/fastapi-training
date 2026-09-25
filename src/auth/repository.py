@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
 
 from src.auth.models import User, Permission, RolePermission
+from src.auth.constants import RoleChoices
 
 
 __all__ = (
@@ -47,6 +48,38 @@ class RolePermissionRepository:
         columns = [RolePermission.permission_id.op('->')('key')]
         rows = self.db.query(*columns).filter(RolePermission.role == role).all()  # NOQA
         return [r[0] for r in rows]
+
+    def update_admin_permissions(self) -> int:
+        permissions = self.db.scalars(select(Permission)).all()
+        if not permissions:
+            return 0
+
+        existing_permission_ids = set(
+            self.db.scalars(select(RolePermission.permission_id).where(RolePermission.role == RoleChoices.ADMIN)).all()
+        )
+        missing_permission_ids = [
+            permission.id for permission in permissions if permission.id not in existing_permission_ids
+        ]
+        if not missing_permission_ids:
+            return 0
+
+        statement = (
+            insert(RolePermission)
+            .values(
+                [
+                    {'role': RoleChoices.ADMIN, 'permission_id': permission_id}
+                    for permission_id in missing_permission_ids
+                ]
+            )
+            .on_conflict_do_nothing(
+                index_elements=[RolePermission.role, RolePermission.permission_id],
+            )
+        )
+
+        result = self.db.execute(statement)
+        self.db.commit()
+
+        return result.rowcount  # NOQA
 
 
 class PermissionRepository:

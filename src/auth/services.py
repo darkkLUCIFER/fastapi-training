@@ -128,6 +128,10 @@ class AuthorizationService:
             return False
         return permission in permissions
 
+    def update_role_admin_permissions(self) -> int:
+        with self.uow:
+            return self.uow.repository.update_admin_permissions()
+
 
 class PermissionSyncService:
     def __init__(self, uow: PermissionUow):

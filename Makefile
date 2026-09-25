@@ -1,4 +1,4 @@
-.PHONY: help makemigrations migrate downgrade current history
+.PHONY: help makemigrations migrate downgrade current history run_local_server run_production_server create_super_user update_permissions run_frontend
 
 help:
 	@echo "FastAPI Database Management Commands:"
@@ -7,6 +7,11 @@ help:
 	@echo "  make downgrade         - Rollback the database by 1 migration step"
 	@echo "  make current           - Show the current migration version in the database"
 	@echo "  make history           - Show the list of all migrations"
+	@echo "  make run_local_server   - start development server"
+	@echo "  make run_production_server   - start production server"
+	@echo "  make create_super_user   - create admin user"
+	@echo "  make update_permissions   - update list of permissions with choices in class PermissionChoices"
+	@echo "  make run_frontend         - start frontend project"
 
 makemigrations:
 	@read -p "Enter migration message: " msg; \
@@ -35,3 +40,9 @@ run_production_server:
 
 create_super_user:
 	@python -m scripts.create_admin
+
+update_permissions:
+	@python -m scripts.update_permissions
+
+run_frontend:
+	@npm --prefix frontend run dev
