@@ -3,7 +3,9 @@ from typing import Annotated
 from pydantic import Field, EmailStr, BaseModel, ConfigDict, StringConstraints, model_validator
 
 from src.core import settings
+from src.auth.constants import RoleChoices
 from src.core.exceptions import NotMatchError
+from src.auth.constants.permission import PermissionChoices
 
 
 __all__ = (
@@ -14,6 +16,7 @@ __all__ = (
     'PermissionListSchema',
     'RegisterSuperUserSchema',
     'RegisterUserResponseSchema',
+    'CreateRolePermissionSchema',
 )
 
 Username = Annotated[
@@ -113,3 +116,14 @@ class PermissionListSchema(BaseModel):
     key: str
     description: str | None
     is_active: bool
+
+
+class CreateRolePermissionSchema(BaseModel):
+    role: RoleChoices
+    permission_id: PermissionChoices
+    access: Annotated[
+        bool,
+        Field(
+            default=True,
+        ),
+    ]

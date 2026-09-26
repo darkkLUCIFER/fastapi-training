@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
 function parseError(error) {
   if (Array.isArray(error.detail)) {
@@ -58,6 +58,12 @@ export const auth = {
     return response.json();
   },
   me: () => request('/auth/me/'),
+};
+
+export const permissions = {
+  list: (options = {}) => request('/auth/permissions/', options),
+  create: (data, options = {}) =>
+    request('/auth/permissions/create/', { method: 'POST', body: JSON.stringify(data), ...options }),
 };
 
 export const todos = {

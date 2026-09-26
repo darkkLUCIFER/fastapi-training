@@ -44,10 +44,13 @@ class RolePermissionRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all_for_user(self, role: str) -> list[str]:
-        columns = [RolePermission.permission_id.op('->')('key')]
-        rows = self.db.query(*columns).filter(RolePermission.role == role).all()  # NOQA
-        return [r[0] for r in rows]
+    def get_all_for_user(self, role: RoleChoices) -> list[str]:
+        stmt = (
+            select(Permission.key)
+            .join(RolePermission, RolePermission.permission_id == Permission.id)
+            .where(RolePermission.role == role)
+        )
+        return list(self.db.scalars(stmt).all())
 
     def update_admin_permissions(self) -> int:
         permissions = self.db.scalars(select(Permission)).all()
