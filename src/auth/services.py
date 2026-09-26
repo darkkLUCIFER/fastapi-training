@@ -125,8 +125,16 @@ class AuthorizationService:
         #     "permissions": [...]
         # }
         with self.uow:
-            all_permissions = self.uow.repository.get_all_for_user(role=user.role)
-            return frozenset(all_permissions) if all_permissions else None
+            keys = self.uow.repository.get_all_for_user(role=user.role)
+            if not keys:
+                return None
+            result = set()
+            for key in keys:
+                try:
+                    result.add(PermissionChoices(key))
+                except ValueError:
+                    continue
+            return frozenset(result) if result else None
 
     def has_permission(self, user: User, permission: PermissionChoices):
         permissions = self.get_permissions(user=user)

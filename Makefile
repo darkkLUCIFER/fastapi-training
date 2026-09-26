@@ -33,7 +33,7 @@ history:
 	@alembic history --verbose
 
 run_local_server:
-	@fastapi dev src/main.py
+	@fastapi dev src/main.py --port 8001
 
 run_production_server:
 	@fastapi run src/main.py

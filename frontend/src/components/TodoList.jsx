@@ -14,7 +14,7 @@ const debounce = (func, delay) => {
   };
 };
 
-export default function TodoList() {
+export default function TodoList({ onGoAdmin }) {
   const { logout, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [todoList, setTodoList] = useState([]);
@@ -137,8 +137,18 @@ export default function TodoList() {
     debouncedFetchTodos();
   }, []);
 
+  const roleValue = user?.role && typeof user.role === 'object' ? user.role.value : user?.role;
+  const isAdmin = roleValue === 'admin' && typeof onGoAdmin === 'function';
+
   return (
     <div className="todo-app">
+      {isAdmin && (
+        <div className="admin-topbar">
+          <button className="btn-admin" onClick={onGoAdmin}>
+            Admin Panel
+          </button>
+        </div>
+      )}
       <header>
         <h1>Todos</h1>
         <div className="header-actions">
