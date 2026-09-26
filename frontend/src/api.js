@@ -1,5 +1,13 @@
 const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
+export class ApiError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
 function parseError(error) {
   if (Array.isArray(error.detail)) {
     return error.detail.map((e) => e.msg).join(', ');
@@ -7,7 +15,13 @@ function parseError(error) {
   return error.detail || 'Request failed';
 }
 
-async function request(endpoint, options = {}) {
+function clearSession() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  window.location.reload();
+}
+
+async function send(endpoint, options = {}) {
   const token = localStorage.getItem('access_token');
   const headers = {
     ...options.headers,
@@ -27,20 +41,44 @@ async function request(endpoint, options = {}) {
     signal: options.signal,
   });
 
-  if (response.status === 401 || response.status === 403) {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    window.location.reload();
-    throw new Error('Unauthorized');
+  if (response.status === 401) {
+    clearSession();
+    throw new ApiError('Your session has expired. Please log in again.', 401);
   }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(parseError(error));
+    throw new ApiError(parseError(error), response.status);
   }
 
   if (response.status === 204) return null;
   return response.json();
+}
+
+const inflight = new Map();
+
+function request(endpoint, options = {}) {
+  const method = (options.method ?? 'GET').toUpperCase();
+
+  // Requests carrying a caller-owned AbortSignal are never shared: aborting one
+  // caller must not cancel another's request.
+  if (method !== 'GET' || options.signal) {
+    return send(endpoint, options);
+  }
+
+  const key = `${localStorage.getItem('access_token') ?? ''} ${endpoint}`;
+  const existing = inflight.get(key);
+  if (existing) return existing;
+
+  const promise = send(endpoint, options);
+  inflight.set(key, promise);
+  const release = () => {
+    if (inflight.get(key) === promise) {
+      inflight.delete(key);
+    }
+  };
+  promise.then(release, release);
+  return promise;
 }
 
 export const auth = {

@@ -86,7 +86,7 @@ def permission_list(service: Annotated[PermissionService, Depends(get_permission
 @router.post(
     '/permissions/create/',
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(RequirePermission)],
+    dependencies=[Depends(RequirePermission(PermissionChoices.PERMISSION_CREATE))],
     summary='Create permission',
     description='Create permission with role admin',
 )

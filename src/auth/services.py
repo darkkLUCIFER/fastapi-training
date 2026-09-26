@@ -137,10 +137,11 @@ class AuthorizationService:
             return frozenset(result) if result else None
 
     def has_permission(self, user: User, permission: PermissionChoices):
-        permissions = self.get_permissions(user=user)
-        if not permissions:
-            return False
-        return permission in permissions
+        with self.uow:
+            return self.uow.repository.has_access(
+                role=user.role,
+                permission_key=permission.value,
+            )
 
     def update_role_admin_permissions(self) -> int:
         with self.uow:

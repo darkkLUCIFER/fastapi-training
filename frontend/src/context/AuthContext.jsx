@@ -3,6 +3,11 @@ import { auth } from '../api';
 
 const AuthContext = createContext(null);
 
+function clearTokens() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,7 +17,11 @@ export function AuthProvider({ children }) {
     if (token) {
       auth.me()
         .then(setUser)
-        .catch(() => localStorage.clear())
+        .catch((err) => {
+          if (err?.status === 401) {
+            clearTokens();
+          }
+        })
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
@@ -32,7 +41,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.clear();
+    clearTokens();
     setUser(null);
   };
 

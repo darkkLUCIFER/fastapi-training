@@ -48,9 +48,22 @@ class RolePermissionRepository:
         stmt = (
             select(Permission.key)
             .join(RolePermission, RolePermission.permission_id == Permission.id)
-            .where(RolePermission.role == role)
+            .where(RolePermission.role == role, RolePermission.access.is_(True))
         )
         return list(self.db.scalars(stmt).all())
+
+    def has_access(self, role: RoleChoices, permission_key: str) -> bool:
+        stmt = (
+            select(RolePermission.id)
+            .join(Permission, RolePermission.permission_id == Permission.id)
+            .where(
+                RolePermission.role == role,
+                RolePermission.access.is_(True),
+                Permission.key == permission_key,
+            )
+            .limit(1)
+        )
+        return self.db.scalar(stmt) is not None
 
     def update_admin_permissions(self) -> int:
         permissions = self.db.scalars(select(Permission)).all()

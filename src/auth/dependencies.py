@@ -24,7 +24,7 @@ __all__ = (
     'get_authorization_service',
 )
 
-bearer_scheme = HTTPBearer(auto_error=True)
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_auth_service(
@@ -44,9 +44,15 @@ def login_user_form_schema(
 
 
 def get_current_payload(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)],
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
     security: Annotated[SecurityUtils, Depends(get_security_utils)],
 ) -> dict[str, Any]:
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Not authenticated',
+            headers={'WWW-Authenticate': settings.jwt_token_location},
+        )
     if credentials.scheme.lower() != settings.jwt_token_location.lower():
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
