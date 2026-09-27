@@ -22,6 +22,7 @@ user_role_enum = ENUM(
     "admin",
     "user",
     name="user_role",
+    create_type=False,
 )
 
 
@@ -41,7 +42,7 @@ def upgrade() -> None:
     sa.Column('first_name', sa.String(), nullable=True),
     sa.Column('last_name', sa.String(), nullable=True),
     sa.Column('is_active', sa.Boolean(), server_default=sa.text('true'), nullable=False),
-    sa.Column('role', sa.Enum('admin', 'user', name='user_role'), server_default='user', nullable=False),
+    sa.Column('role', user_role_enum, server_default='user', nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id'),
