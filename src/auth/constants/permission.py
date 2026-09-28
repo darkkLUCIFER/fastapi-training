@@ -16,7 +16,12 @@ class PermissionChoices(ChoiceEnum):
     AUTH_TOKEN_REFRESH_VIEW = 'auth.token-refresh.view', _('auth.token-refresh.view')
     AUTH_ME_VIEW = 'auth.me.view', _('auth.me.view')
 
-    PERMISSION_LIST_VIEW = 'permission.list.view', _('permission.list.view')
-    PERMISSION_CREATE = 'permission.create', _('permission.create')
-    PERMISSION_UPDATE = 'permission.update', _('permission.update')
-    PERMISSION_DELETE = 'permission.delete', _('permission.delete')
+    PERMISSION_LIST_VIEW = 'auth.permission.list.view', _('auth.permission.list.view')
+    PERMISSION_CREATE = 'auth.permission.create', _('auth.permission.create')
+    PERMISSION_UPDATE = 'auth.permission.update', _('auth.permission.update')
+    PERMISSION_DELETE = 'auth.permission.delete', _('auth.permission.delete')
+
+    ROLE_PERMISSION_LIST_VIEW = 'auth.role-permission.list.view', _('auth.role-permission.list.view')
+    ROLE_PERMISSION_CREATE = 'auth.role-permission.create', _('auth.role-permission.create')
+    ROLE_PERMISSION_UPDATE = 'auth.role-permission.update', _('auth.role-permission.update')
+    ROLE_PERMISSION_DETAIL = 'auth.role-permission.detail', _('auth.role-permission.detail')
