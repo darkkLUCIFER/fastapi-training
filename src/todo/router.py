@@ -44,7 +44,7 @@ def list_todos(
 
 
 @router.get(
-    '/{todo_id}',
+    '/{todo_id}/',
     response_model=TodoResponseSchema,
     status_code=status.HTTP_200_OK,
     summary='Get a todo by ID',
@@ -59,7 +59,7 @@ def get_todo(
 
 
 @router.patch(
-    '/{todo_id}',
+    '/{todo_id}/',
     response_model=TodoResponseSchema,
     status_code=status.HTTP_200_OK,
     summary='Update a todo',
@@ -75,7 +75,7 @@ def update_todo(
 
 
 @router.delete(
-    '/{todo_id}',
+    '/{todo_id}/',
     status_code=status.HTTP_204_NO_CONTENT,
     summary='Delete a todo',
     description='Delete a todo item by its ID.',
