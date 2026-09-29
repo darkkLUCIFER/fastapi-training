@@ -5,6 +5,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import TodoList from './components/TodoList';
 import AdminPanel from './components/AdminPanel';
+import AdminPermissions from './components/AdminPermissions';
+import AdminRolePermissions from './components/AdminRolePermissions';
 import './App.css';
 
 function isAdminRole(role) {
@@ -29,8 +31,22 @@ function AppContent() {
 
   const isAdmin = isAdminRole(user.role);
 
-  if (page === 'admin' && isAdmin) {
-    return <AdminPanel onBack={() => setPage('todos')} />;
+  if (isAdmin) {
+    if (page === 'admin') {
+      return (
+        <AdminPanel
+          onBack={() => setPage('todos')}
+          onOpenPermissions={() => setPage('admin-permissions')}
+          onOpenRolePermissions={() => setPage('admin-role-permissions')}
+        />
+      );
+    }
+    if (page === 'admin-permissions') {
+      return <AdminPermissions onBack={() => setPage('admin')} />;
+    }
+    if (page === 'admin-role-permissions') {
+      return <AdminRolePermissions onBack={() => setPage('admin')} />;
+    }
   }
 
   return <TodoList onGoAdmin={isAdmin ? () => setPage('admin') : undefined} />;

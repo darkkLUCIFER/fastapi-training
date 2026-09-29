@@ -15,6 +15,18 @@ function parseError(error) {
   return error.detail || 'Request failed';
 }
 
+// Unhandled server errors (500, proxy errors, gateway pages) come back as
+// plain text or HTML, so fall back to the raw body for a readable message.
+async function readErrorBody(response) {
+  const raw = await response.text();
+  if (!raw) return 'Request failed';
+  try {
+    return parseError(JSON.parse(raw));
+  } catch {
+    return raw.slice(0, 200).trim() || 'Request failed';
+  }
+}
+
 function clearSession() {
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
@@ -47,8 +59,7 @@ async function send(endpoint, options = {}) {
   }
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new ApiError(parseError(error), response.status);
+    throw new ApiError(await readErrorBody(response), response.status);
   }
 
   if (response.status === 204) return null;
@@ -99,9 +110,17 @@ export const auth = {
 };
 
 export const permissions = {
-  list: (options = {}) => request('/auth/permissions/', options),
+  list: (options = {}) => request('/admin/permissions/', options),
+};
+
+export const rolePermissions = {
+  list: (options = {}) => request('/admin/role-permission/', options),
   create: (data, options = {}) =>
-    request('/auth/permissions/create/', { method: 'POST', body: JSON.stringify(data), ...options }),
+    request('/admin/role-permission/create/', { method: 'POST', body: JSON.stringify(data), ...options }),
+  detail: (id, options = {}) => request(`/admin/role-permission/${id}/`, options),
+  update: (id, data, options = {}) =>
+    request(`/admin/role-permission/${id}/`, { method: 'PATCH', body: JSON.stringify(data), ...options }),
+  remove: (id, options = {}) => request(`/admin/role-permission/${id}/`, { method: 'DELETE', ...options }),
 };
 
 export const todos = {
