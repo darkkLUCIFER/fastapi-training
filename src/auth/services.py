@@ -132,7 +132,7 @@ class AuthorizationService:
         #     "permissions": [...]
         # }
         with self.uow:
-            keys = self.uow.repository.get_all_for_user(role=user.role)
+            keys = self.uow.repository.get_all_active_for_user(role=user.role)
             if not keys:
                 return None
             result = set()

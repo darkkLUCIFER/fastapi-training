@@ -51,7 +51,7 @@ class RolePermissionRepository:
     def delete(self, role_permission: RolePermission) -> None:
         self.db.delete(role_permission)
 
-    def get_all_for_user(self, role: RoleChoices) -> list[str]:
+    def get_all_active_for_user(self, role: RoleChoices) -> list[str]:
         stmt = (
             select(Permission.key)
             .join(RolePermission, RolePermission.permission_id == Permission.id)
