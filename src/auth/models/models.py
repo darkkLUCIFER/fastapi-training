@@ -1,5 +1,5 @@
 from sqlalchemy import Text, String, Boolean, BigInteger, ForeignKey, UniqueConstraint, true
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 
 from src.core import Base
 from src.auth.constants import RoleChoices
@@ -40,6 +40,9 @@ class Permission(TimestampMixin, Base):
     key: Mapped[str] = mapped_column(String(length=100), nullable=False, unique=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true(), nullable=False)
+    role_permissions: Mapped[list['RolePermission']] = relationship(
+        'RolePermission', back_populates='permission', lazy='raise'
+    )
 
 
 class RolePermission(TimestampMixin, Base):
@@ -54,5 +57,6 @@ class RolePermission(TimestampMixin, Base):
     )
     permission_id: Mapped[int] = mapped_column(ForeignKey('permissions.id', ondelete='CASCADE'), nullable=False)
     access: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true(), nullable=False)
+    permission: Mapped[Permission] = relationship('Permission', back_populates='role_permissions', lazy='raise')
 
     __table_args__ = (UniqueConstraint('role', 'permission_id', name='uq_role_permission'),)
