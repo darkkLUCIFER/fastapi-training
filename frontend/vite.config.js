@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/auth': 'http://localhost:8001',
+      '/users': 'http://localhost:8001',
       '/todo': 'http://localhost:8001',
       '/admin': 'http://localhost:8001',
     },

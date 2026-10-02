@@ -25,3 +25,4 @@ class PermissionChoices(ChoiceEnum):
     ROLE_PERMISSION_CREATE = 'auth.role-permission.create', _('auth.role-permission.create')
     ROLE_PERMISSION_UPDATE = 'auth.role-permission.update', _('auth.role-permission.update')
     ROLE_PERMISSION_DETAIL = 'auth.role-permission.detail', _('auth.role-permission.detail')
+    ROLE_PERMISSION_DELETE = 'auth.role-permission.delete', _('auth.role-permission.delete')

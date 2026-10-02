@@ -79,10 +79,12 @@ export default function AdminRolePermissions({ onBack }) {
     try {
       await rolePermissions.create({
         role: draft.role,
-        permission_id: draft.permissionId,
+        permission_id: Number(draft.permissionId),
         access: draft.access,
       });
-      setSuccess(`Granted "${draft.permissionId}" to "${draft.role}".`);
+      setSuccess(
+        `Granted "${permissionKeyById[Number(draft.permissionId)] ?? draft.permissionId}" to "${draft.role}".`,
+      );
       setDraft(emptyDraft);
       await load();
     } catch (err) {
@@ -108,7 +110,6 @@ export default function AdminRolePermissions({ onBack }) {
     setSubmitting(true);
     try {
       await rolePermissions.update(id, {
-        id,
         role: editDraft.role,
         permission_id: Number(editDraft.permissionId),
         access: editDraft.access,
@@ -128,7 +129,6 @@ export default function AdminRolePermissions({ onBack }) {
     setBusyId(row.id);
     try {
       await rolePermissions.update(row.id, {
-        id: row.id,
         role: roleValue(row.role),
         permission_id: row.permission_id,
         access: !row.access,
@@ -203,7 +203,7 @@ export default function AdminRolePermissions({ onBack }) {
             >
               <option value="">Select a permission</option>
               {permissionList.map((permission) => (
-                <option key={permission.id} value={permission.key}>
+                <option key={permission.id} value={permission.id}>
                   {permission.key}
                 </option>
               ))}

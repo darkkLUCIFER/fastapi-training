@@ -21,7 +21,6 @@ class Settings(BaseSettings):
     def validate_database_url(cls, v: str) -> str:
         """Ensure database URL uses PostgreSQL syntax if needed."""
         if v.startswith('sqlite:///'):
-            # Optionally warn about using SQLite in production
             print('Warning: Using SQLite!!! For production, use PostgreSQL.')  # noqa
         return v
 

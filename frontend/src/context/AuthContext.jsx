@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../api';
+import { auth, users } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (token) {
-      auth.me()
+      users.me()
         .then(setUser)
         .catch((err) => {
           if (err?.status === 401) {
@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
     const data = await auth.login(username, password);
     localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('refresh_token', data.refresh_token);
-    const userData = await auth.me();
+    const userData = await users.me();
     setUser(userData);
   };
 

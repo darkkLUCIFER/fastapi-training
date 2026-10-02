@@ -4,22 +4,29 @@ import jwt
 from fastapi import HTTPException
 from starlette import status
 
-from src.core import NotMatchError, SecurityUtils
+from src.core import NotFoundError, NotMatchError, SecurityUtils
 from src.auth.uow import AuthUow, PermissionUow, RolePermissionUow
-from src.auth.models import User, Permission
+from src.auth.models import User, RolePermission
 from src.auth.schema import (
     LoginUserSchema,
     TokenUserSchema,
     RegisterUserSchema,
     RegisterSuperUserSchema,
     CreateRolePermissionSchema,
+    UpdateRolePermissionSchema,
 )
 from src.core.config import settings
 from src.auth.constants import RoleChoices
 from src.auth.constants.permission import PermissionChoices
 
 
-__all__ = ('AuthService', 'PermissionService', 'AuthorizationService', 'PermissionSyncService')
+__all__ = (
+    'AuthService',
+    'PermissionService',
+    'AuthorizationService',
+    'PermissionSyncService',
+    'RolePermissionService',
+)
 
 
 class AuthService:
@@ -165,5 +172,43 @@ class PermissionService:
         with self.uow:
             return self.uow.repository.get_all_permissions()
 
-    def create_permission(self, data: CreateRolePermissionSchema) -> Permission:
-        pass
+
+class RolePermissionService:
+    def __init__(self, uow: RolePermissionUow):
+        self.uow = uow
+
+    def get_list_all_role_permissions(self) -> list[RolePermission]:
+        with self.uow:
+            return self.uow.repository.get_all()
+
+    def create_role_permission(self, data: CreateRolePermissionSchema) -> RolePermission:
+        with self.uow:
+            role_permission = RolePermission(**data.model_dump())
+            self.uow.repository.create(role_permission=role_permission)
+            self.uow.commit()
+        return role_permission
+
+    def get_role_permission(self, role_permission_id: int) -> RolePermission:
+        with self.uow:
+            return self._get_role_permission_or_raise(role_permission_id=role_permission_id)
+
+    def update_role_permission(self, role_permission_id: int, data: UpdateRolePermissionSchema) -> RolePermission:
+        with self.uow:
+            role_permission = self._get_role_permission_or_raise(role_permission_id=role_permission_id)
+            for field, value in data.model_dump(exclude_unset=True).items():
+                setattr(role_permission, field, value)
+            self.uow.commit()
+            self.uow.refresh(role_permission)
+        return role_permission
+
+    def delete_role_permission(self, role_permission_id: int) -> None:
+        with self.uow:
+            role_permission = self._get_role_permission_or_raise(role_permission_id=role_permission_id)
+            self.uow.repository.delete(role_permission=role_permission)
+            self.uow.commit()
+
+    def _get_role_permission_or_raise(self, role_permission_id: int) -> RolePermission:
+        role_permission = self.uow.repository.get_by_id(role_permission_id=role_permission_id)
+        if not role_permission:
+            raise NotFoundError(object_id=role_permission_id, model_name=RolePermission.__name__)
+        return role_permission

@@ -10,7 +10,7 @@ from src.core import SecurityUtils
 from src.auth.uow import AuthUow, PermissionUow, RolePermissionUow
 from src.auth.schema import LoginUserSchema
 from src.core.config import settings
-from src.auth.services import AuthService, PermissionService, AuthorizationService
+from src.auth.services import AuthService, PermissionService, AuthorizationService, RolePermissionService
 from src.core.dependencies import get_security_utils
 from src.core.database.session import get_db
 
@@ -22,6 +22,7 @@ __all__ = (
     'login_user_form_schema',
     'get_permission_service',
     'get_authorization_service',
+    'get_role_permission_service',
 )
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -92,3 +93,7 @@ def get_authorization_service(db: Annotated[Session, Depends(get_db)]) -> Author
 
 def get_permission_service(db: Annotated[Session, Depends(get_db)]) -> PermissionService:
     return PermissionService(uow=PermissionUow(db))
+
+
+def get_role_permission_service(db: Annotated[Session, Depends(get_db)]) -> RolePermissionService:
+    return RolePermissionService(uow=RolePermissionUow(db))

@@ -106,7 +106,10 @@ export const auth = {
     }
     return response.json();
   },
-  me: () => request('/auth/me/'),
+};
+
+export const users = {
+  me: () => request('/users/me/'),
 };
 
 export const permissions = {

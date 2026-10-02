@@ -5,7 +5,6 @@ from pydantic import Field, EmailStr, BaseModel, ConfigDict, StringConstraints, 
 from src.core import settings
 from src.auth.constants import RoleChoices
 from src.core.exceptions import NotMatchError
-from src.auth.constants.permission import PermissionChoices
 
 
 __all__ = (
@@ -14,9 +13,12 @@ __all__ = (
     'RefreshTokenSchema',
     'RegisterUserSchema',
     'PermissionListSchema',
+    'PermissionDetailSchema',
     'RegisterSuperUserSchema',
     'RegisterUserResponseSchema',
     'CreateRolePermissionSchema',
+    'DetailRolePermissionSchema',
+    'UpdateRolePermissionSchema',
 )
 
 Username = Annotated[
@@ -120,10 +122,34 @@ class PermissionListSchema(BaseModel):
 
 class CreateRolePermissionSchema(BaseModel):
     role: RoleChoices
-    permission_id: PermissionChoices
+    permission_id: int
     access: Annotated[
         bool,
         Field(
             default=True,
         ),
     ]
+
+
+class PermissionDetailSchema(BaseModel):
+    id: int
+    key: str
+    description: str | None
+    is_active: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DetailRolePermissionSchema(BaseModel):
+    id: int
+    role: RoleChoices
+    permission: PermissionDetailSchema
+    access: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UpdateRolePermissionSchema(BaseModel):
+    role: RoleChoices
+    permission_id: int
+    access: bool
