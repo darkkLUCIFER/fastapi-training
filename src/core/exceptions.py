@@ -1,6 +1,8 @@
 __all__ = (
     'NotFoundError',
     'NotMatchError',
+    'ConflictError',
+    'BadRequestError',
     'PermissionDenied',
 )
 
@@ -15,6 +17,22 @@ class NotFoundError(Exception):
 class NotMatchError(Exception):
     def __init__(self):
         super().__init__('Input data does not match')
+
+
+class ConflictError(Exception):
+    """Raised when  write collides with existing state, e.g. a unique constraint."""
+
+    def __init__(self, detail: str):
+        self.detail = detail
+        super().__init__(detail)
+
+
+class BadRequestError(Exception):
+    """Raised when write is rejected because the submitted data is unusable."""
+
+    def __init__(self, detail: str):
+        self.detail = detail
+        super().__init__(detail)
 
 
 class PermissionDenied(Exception):
