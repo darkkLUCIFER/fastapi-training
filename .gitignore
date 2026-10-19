@@ -163,6 +163,7 @@ cython_debug/
 *.db
 .mimocode/
 graphify-out/
+ROADMAP_FASTAPI_SENIOR.md
 
 # Frontend
 frontend/node_modules/
