@@ -6,7 +6,14 @@ from sqlalchemy.exc import IntegrityError as DriverIntegrityError
 from src.core.exceptions import ConflictError, BadRequestError
 
 
-__all__ = ('ConstraintViolation', 'IntegrityErrorTranslator')
+__all__ = (
+    'FALLBACK_VIOLATION',
+    'ConstraintViolation',
+    'IntegrityErrorTranslator',
+    'SQLSTATE_UNIQUE_VIOLATION',
+    'SQLSTATE_NOT_NULL_VIOLATION',
+    'SQLSTATE_FOREIGN_KEY_VIOLATION',
+)
 
 
 @dataclass(frozen=True, slots=True)

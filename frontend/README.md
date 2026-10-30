@@ -1,5 +1,16 @@
 # React + Vite
 
+## Project checks
+
+- `npm test` runs the API-client tests with Node's built-in test runner.
+- `npm run lint` runs Oxlint.
+- `npm run build` creates the production frontend bundle.
+
+The API-client tests use mocked `fetch`, storage, and browser globals; they do
+not require a running backend or database.
+
+## Vite template notes
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:
