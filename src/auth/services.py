@@ -152,7 +152,9 @@ class AuthorizationService:
 
     def update_role_admin_permissions(self) -> int:
         with self.uow:
-            return self.uow.repository.update_admin_permissions()
+            created_count = self.uow.repository.update_admin_permissions()
+            self.uow.commit()
+            return created_count
 
 
 class PermissionSyncService:
@@ -161,7 +163,10 @@ class PermissionSyncService:
 
     def sync(self) -> int:
         keys = {permission.value for permission in PermissionChoices}
-        return self.uow.repository.create_missing_permissions(keys)
+        with self.uow:
+            created_count = self.uow.repository.create_missing_permissions(keys)
+            self.uow.commit()
+            return created_count
 
 
 class PermissionService:

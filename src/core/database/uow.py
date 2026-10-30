@@ -11,20 +11,22 @@ __all__ = ('BaseUow',)
 
 
 class BaseUow:
-    """Unit of work: one repository, one session, one transaction.
+    """Unit of work: coordinate repositories on one session and transaction.
 
-    Committing is the only place a constraint violation can surface, so it is
-    also the only place that needs to translate it. Subclasses opt in by setting
-    ``integrity_errors``; units of work that leave it unset propagate the driver
-    error untouched.
+    Repositories stage changes without committing. The service commits once the
+    operation is ready; an uncommitted transaction is rolled back on context exit.
+    Committing is also where constraint violations are translated. Subclasses opt
+    in by setting ``integrity_errors``; otherwise driver errors propagate.
     """
 
     integrity_errors: ClassVar[IntegrityErrorTranslator | None] = None
 
     def __init__(self, session: Session):
         self.session = session
+        self._transaction_finished = False
 
     def __enter__(self) -> Self:
+        self._transaction_finished = False
         return self
 
     def __exit__(
@@ -33,12 +35,15 @@ class BaseUow:
         exc: BaseException | None,
         tb: TracebackType | None,
     ) -> None:
-        if exc_type is not None:
+        # A read after commit (for example, refresh) can open another transaction.
+        # Close it too, and discard any work if the context exits without a commit.
+        if not self._transaction_finished or self.session.in_transaction():
             self.rollback()
 
     def commit(self) -> None:
         try:
             self.session.commit()
+            self._transaction_finished = True
         except DriverIntegrityError as exc:
             # Roll back first: the session is unusable until the failed
             # transaction is closed, and the dependency may still be reused.
@@ -49,6 +54,7 @@ class BaseUow:
 
     def rollback(self) -> None:
         self.session.rollback()
+        self._transaction_finished = True
 
     def refresh(self, obj: Any) -> None:
         self.session.refresh(obj)

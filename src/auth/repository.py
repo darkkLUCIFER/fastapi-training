@@ -102,7 +102,6 @@ class RolePermissionRepository:
         )
 
         result = self.db.execute(statement)
-        self.db.commit()
 
         return result.rowcount  # NOQA
 
@@ -136,7 +135,6 @@ class PermissionRepository:
         )
 
         result = self.db.execute(statement)
-        self.db.commit()
 
         return result.rowcount  # NOQA
 
