@@ -18,6 +18,8 @@ bcrypt==4.3.0
 # jwt
 PyJWT[crypto]
 
+# test
+pytest==9.2.*
 
 # other
 python-multipart==0.0.12
