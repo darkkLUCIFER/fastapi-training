@@ -1,139 +1,58 @@
-For management commands it's better to use typer if
-you need to write custom scripts that actually execute Python code and database queries
+# Books FastAPI
 
-for this first you should install typer with the below command:
+A FastAPI service with JWT authentication, role based permissions, and
+user-owned todo items, plus a React frontend. The backend uses SQLAlchemy 2,
+Alembic, and PostgreSQL (SQLite can be used for local tests).
 
-```shell
-pip install typer
-```
+## Quick start
 
-then make a file named manage.py in root directory of your project
-and then make commands like below:
-
-```shell
-# manage.py
-import os
-import subprocess
-import typer
-
-
-app = typer.Typer()
-
-
-@app.command()
-def makemigrations(message: str = typer.Option(..., "-m", "--message", prompt="Migration message")):
-    """Generate a new Alembic migration."""
-    typer.echo(f"Generating migration: {message}")
-    subprocess.run(["alembic", "revision", "--autogenerate", "-m", message])
-
-
-@app.command()
-def migrate():
-    """Apply migrations to the database."""
-    typer.echo("Applying migrations...")
-    subprocess.run(["alembic", "upgrade", "head"])
-
-
-@app.command()
-def downgrade(steps: int = typer.Option(1, "-s", "--steps")):
-    """Rollback migrations."""
-    typer.echo(f"Rolling back {steps} step(s)...")
-    subprocess.run(["alembic", "downgrade", f"-{steps}"])
-
-
-if __name__ == "__main__":
-    app()
-
-```
-
-# How to use management command with typer package:
-
-- commands are stored inside file manage.py in root directory
-
-## for making migration
-
-```shell
-python manage.py makemigrations -m "add users table"
-```
-
-## for migrate changes to DB
-
-```shell
-python manage.py migrate
-```
-
-## for downgrade changes
-
-```shell
-python manage.py downgrade -s 1
-```
-
-but for simple commands it's better to use `Makefile`
-for that first make a file named `Makefile` in root directory
-
-then make commands inside it as below:
-```shell
-.PHONY: help makemigrations migrate downgrade current history
-
-# Default command when you just type `make`
-help:
-    @echo "FastAPI Database Management Commands:"
-    @echo "  make makemigrations    - Generate a new Alembic migration (will prompt for message)"
-    @echo "  make migrate           - Apply all pending migrations to the database"
-    @echo "  make downgrade         - Rollback the database by 1 migration step"
-    @echo "  make current           - Show the current migration version in the database"
-    @echo "  make history           - Show the list of all migrations"
-
-# Equivalent to Django's makemigrations
-makemigrations:
-    @read -p "Enter migration message: " msg; \
-    alembic revision --autogenerate -m "$$msg"
-
-# Equivalent to Django's migrate
-migrate:
-    @echo "Applying migrations..."
-    @alembic upgrade head
-    @echo "Migrations applied successfully."
-
-# Rollback 1 step
-downgrade:
-    @echo "Rolling back 1 step..."
-    @alembic downgrade -1
-
-# Check current state
-current:
-    @alembic current
-
-# View migration history
-history:
-    @alembic history --verbose
-```
-
-
-## ⚠️ Troubleshooting
-
-### Passlib & bcrypt Version Compatibility
-
-If you are using `passlib==1.7.4` with a recent version of `bcrypt` (especially `bcrypt==5.x`), you may encounter the following error when hashing or verifying passwords:
-
-```text
-ValueError: password cannot be longer than 72 bytes, truncate manually if necessary
-```
-
-This issue is caused by a compatibility problem between passlib==1.7.4 and newer versions of bcrypt.
-To fix this issue, use the following compatible versions:
+Requirements: Python 3.12+, PostgreSQL, and Node.js/npm for the frontend.
 
 ```bash
-passlib==1.7.4
-bcrypt==4.3.0
+python3.12 -m venv venv
+source venv/bin/activate
+pip install -e '.[dev]'
+cp .env.example .env
+# Edit .env and set DATABASE_URL and a private JWT_SECRET_KEY.
+make migrate
+make update_permissions
+make create_super_user
+make run_local_server
 ```
 
-If you already have an incompatible version of bcrypt installed, you can install the compatible version with:
+The API listens on `http://127.0.0.1:8001`. Interactive API documentation is
+available at `/docs`, and the OpenAPI document is at `/openapi.json`.
+
+Run the React frontend in another terminal:
+
 ```bash
-pip install "bcrypt==4.3.0"
+cd frontend
+npm install
+npm run dev
 ```
 
-If you want to generate random secret_key for jwt, you can use below
-```bash
-openssl rand -hex 32
-```
+## Documentation
+
+- [Development setup and configuration](docs/development.md)
+- [API endpoints and authentication](docs/api.md)
+- [Architecture and data flow](docs/architecture.md)
+- [Testing guide](docs/testing.md)
+
+## Useful commands
+
+Run from the repository root with the virtual environment activated:
+
+| Command | Purpose |
+| --- | --- |
+| `make run_local_server` | Start the backend with reload on port 8001 |
+| `make run_production_server` | Start the production ASGI server |
+| `make makemigrations` | Create an Alembic migration (interactive message) |
+| `make migrate` | Apply migrations to the configured database |
+| `make downgrade` | Roll back one migration |
+| `make current` / `make history` | Inspect migration state/history |
+| `make create_super_user` | Interactively create an administrator |
+| `make update_permissions` | Sync permission records and grants to the admin role |
+| `./venv/bin/pytest -q` | Run backend tests |
+
+Frontend checks run from `frontend/`: `npm test`, `npm run lint`, and
+`npm run build`.

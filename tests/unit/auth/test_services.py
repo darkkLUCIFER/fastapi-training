@@ -96,6 +96,19 @@ def test_login_returns_access_and_refresh_tokens(auth_service):
     security.create_access_token.assert_called_once_with(subject='12', extra_claims={'username': 'ada', 'role': 'user'})
 
 
+def test_login_rejects_inactive_user_without_issuing_tokens(auth_service):
+    uow, security, service = auth_service
+    uow.repository.get_by_username.return_value = user(active=False)
+    security.verify_password.return_value = True
+
+    with pytest.raises(NotMatchError):
+        service.login_user(LoginUserSchema(username='ada', password='password123'))
+
+    security.verify_password.assert_not_called()
+    security.create_access_token.assert_not_called()
+    security.create_refresh_token.assert_not_called()
+
+
 @pytest.mark.parametrize('found_user,password_valid', [(None, False), (True, False)])
 def test_login_rejects_unknown_user_or_wrong_password(auth_service, found_user, password_valid):
     uow, security, service = auth_service

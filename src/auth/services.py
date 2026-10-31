@@ -64,7 +64,7 @@ class AuthService:
 
     def login_user(self, data: LoginUserSchema) -> TokenUserSchema:
         user = self.uow.repository.get_by_username(username=data.username)
-        if not user or not self.security.verify_password(data.password, user.hashed_password):
+        if not user or not user.is_active or not self.security.verify_password(data.password, user.hashed_password):
             raise NotMatchError
 
         role = getattr(user.role, 'value', user.role)
